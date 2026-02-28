@@ -1,5 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from '@sveltejs/kit';
+import type { Actions } from './$types';
 import { auth } from '$lib/server/auth';
 import { validateLoginForm } from '$lib/server/auth/validation';
 

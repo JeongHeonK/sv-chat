@@ -1,5 +1,6 @@
 <script lang="ts">
-	let { form } = $props();
+	import type { PageProps } from './$types';
+	let { form }: PageProps = $props();
 </script>
 
 <form method="POST">
