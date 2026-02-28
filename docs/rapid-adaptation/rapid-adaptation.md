@@ -164,3 +164,36 @@ export const store = new ChatStore();
 ```
 
 > "도구에 종속되지 않고, 필요한 도구를 빠르게 익혀 최적의 아키텍처를 설계하는 개발자"
+
+---
+
+## 6. Agent Context 최적화
+
+스킬로 문서화한 지식을 AI 에이전트가 효율적으로 활용하도록 컨텍스트 구조를 최적화했다.
+
+### 6.1 배경
+
+[Vercel 블로그](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals) 분석 결과, 스킬 자동 트리거 실패율이 56%로 높아 **수동적 컨텍스트(CLAUDE.md 파일 인덱스)**가 더 신뢰할 수 있었다. 설치한 7개 스킬(7,399줄) 중 상당수가 Claude의 사전 훈련 지식과 중복되거나, 프로젝트 스택과 불일치(React 기반 shadcn-ui 등)하는 문제가 있었다.
+
+### 6.2 최적화 내용
+
+| 항목              | Before             | After                        |
+| ----------------- | ------------------ | ---------------------------- |
+| 스킬 수           | 7개                | 4개                          |
+| 스킬 총 라인      | 7,399줄            | 2,007줄 (-73%)               |
+| CLAUDE.md         | 인덱스 없음        | 문서 인덱스 + 기술별 참조 맵 |
+| 프레임워크 불일치 | 1개 (React shadcn) | 0                            |
+
+**경량화 원칙:**
+
+- **유지**: Claude 사전 훈련에 없는 Svelte 5 전용 gotcha/패턴 (`$state.raw`, `$derived.by`, `svelte:boundary` bug #17717 등)
+- **제거**: 기본 문법, 표준 SvelteKit 컨벤션, 프로젝트에 해당하지 않는 DB/런타임 예시
+
+**패시브 인덱싱:**
+
+CLAUDE.md에 문서 인덱스와 기술별 참조 맵을 추가하여, 에이전트가 프로젝트 코드를 먼저 탐색한 후 필요 시 관련 스킬을 참조하는 "retrieval-led reasoning" 패턴을 적용했다.
+
+### 6.3 관련 링크
+
+- [CLAUDE.md](../../CLAUDE.md) — 문서 인덱스 + 기술별 참조 맵
+- [Vercel: agents-md outperforms skills](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals) — 근거 블로그

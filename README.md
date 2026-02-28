@@ -90,6 +90,14 @@ SvelteKit의 Vite 개발 서버와 adapter-node 프로덕션 환경 모두에서
 
 better-auth 세션 기반 인증과 Socket.io handshake를 연결하여 인증된 사용자만 실시간 채팅에 참여할 수 있는 구조를 구현했습니다. 쿠키 헤더를 `auth.api.getSession()`에 직접 전달하는 방식으로 HTTP 세션과 WebSocket 인증 컨텍스트를 브릿지했습니다.
 
+### Agent Context 최적화
+
+[Vercel 블로그 분석](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals) 결과를 기반으로 AI 에이전트 컨텍스트를 최적화했습니다.
+
+- **스킬 73% 경량화**: 7개(7,399줄) → 4개(2,007줄). Claude 사전 훈련에 이미 있는 기본 문법 제거, gotcha/패턴만 유지
+- **패시브 인덱싱**: CLAUDE.md에 문서 인덱스 + 기술별 참조 맵 추가. 스킬 자동 트리거(56% 실패) 대신 파일 인덱스 기반 패시브 컨텍스트 주입
+- **Retrieval-led reasoning**: 사전 훈련 데이터보다 프로젝트 내 최신 코드/문서를 우선 탐색하도록 지시문 추가
+
 ---
 
 ## 프로젝트 구조
