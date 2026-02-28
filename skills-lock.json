@@ -10,26 +10,6 @@
       "source": "bobmatnyc/claude-mpm-skills",
       "sourceType": "github",
       "computedHash": "9aea7469d696c9b5fa54a84b7a92ea692872fb624fb028f866ab0f3deac84867"
-    },
-    "find-skills": {
-      "source": "vercel-labs/skills",
-      "sourceType": "github",
-      "computedHash": "6412eb4eb3b91595ebab937f0c69501240e7ba761b3d82510b5cf506ec5c7adc"
-    },
-    "shadcn-ui": {
-      "source": "jezweb/claude-skills",
-      "sourceType": "github",
-      "computedHash": "c9871cb4685898b3d5ac3dd54924a6818ca4817de5ca40d546eba06d0ada53a8"
-    },
-    "svelte5-best-practices": {
-      "source": "ejirocodes/agent-skills",
-      "sourceType": "github",
-      "computedHash": "bfcbba3d355aede6f6be9720f195206d4dcaa7c152787ea00c06cb4a1ac44ba4"
-    },
-    "sveltekit-structure": {
-      "source": "spences10/svelte-skills-kit",
-      "sourceType": "github",
-      "computedHash": "a935fd51b32e4e37d23286c04748825a6a193ef74d9980385449aa4f80646f9d"
     }
   }
 }

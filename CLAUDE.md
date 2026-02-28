@@ -1,5 +1,9 @@
 # sv-chat — 1:1 채팅 웹 애플리케이션
 
+> IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning.
+> 프로젝트 코드와 docs/ 문서를 먼저 탐색한 후 구현할 것.
+> 사전 훈련 데이터보다 프로젝트 내 최신 문서와 코드 패턴 우선.
+
 ## 스택
 
 - **Framework**: SvelteKit 5 (Svelte 5 Runes 문법)
@@ -52,6 +56,35 @@ src/
 - `any` 사용 금지 → `unknown` + type guard 활용
 - type assertion (`as`) 최소화 → 타입 추론과 narrowing 우선
 - Discriminated union으로 상태 모델링
+
+## 문서 인덱스 (Documentation Index)
+
+프로젝트 컨텍스트 파악 시 아래 문서를 우선 참조:
+
+| 목적      | 경로                                        | 요약                                |
+| --------- | ------------------------------------------- | ----------------------------------- |
+| 요구사항  | `docs/prd/prd.md`                           | 기능 명세, 마일스톤, UI/UX          |
+| 기술 선택 | `docs/tech_decision/tech_decision.md`       | 왜 Socket.io? Drizzle? better-auth? |
+| 학습 과정 | `docs/rapid-adaptation/rapid-adaptation.md` | 실제 문제 해결 사례                 |
+| 구현 작업 | `docs/task/*.md`                            | 순차적 작업 체크리스트 (14개)       |
+
+## 기술별 참조 맵
+
+프로젝트 코드를 먼저 탐색한 후, 필요 시 아래 skills 참조:
+
+| 영역                 | Skill                        | 핵심 내용                                  |
+| -------------------- | ---------------------------- | ------------------------------------------ |
+| Svelte 5 + SvelteKit | `svelte5`                    | runes.md, sveltekit.md, ssr-hydration.md   |
+| Socket.io 통합       | `socketio-sveltekit`         | dev/prod 이중 구조, better-auth 연동       |
+| DB 스키마/쿼리       | `drizzle-orm`                | PostgreSQL 전용, type inference, N+1 방지  |
+| 인증                 | `better-auth-best-practices` | 세션 설정, 플러그인, Drizzle 어댑터        |
+| UI 컴포넌트          | shadcn-svelte (context7)     | `npx shadcn-svelte@latest add <component>` |
+
+<!-- Agent Context 최적화 근거 (https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals)
+- 수평적(범용) 지식 → CLAUDE.md 파일 인덱스로 패시브 제공 (skill 자동 트리거 56% 실패)
+- 수직적(특정 액션) 워크플로우만 skill로 유지
+- 40KB → 8KB 인덱스 압축으로 동일 성능 달성
+- "Explore project first, then consult docs" 패턴 적용 -->
 
 ## Workflow
 
