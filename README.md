@@ -73,6 +73,25 @@ pnpm dev
 | `pnpm test`     | 전체 테스트                 |
 | `pnpm format`   | 코드 포맷팅                 |
 
+## Technical Deep Dive
+
+### Svelte 5 Runes 적응
+
+Svelte 5의 Runes 문법(`$state`, `$derived`, `$effect`, `$props`)을 기반으로 반응성 시스템을 구현했습니다. React/Vue 경험과의 멘탈 모델 매핑, Class-based State 패턴으로 도메인 로직을 UI와 분리한 과정은 [Rapid Adaptation](./docs/rapid-adaptation.md)에서 확인할 수 있습니다.
+
+### Socket.io 실시간 통신 설계
+
+SvelteKit의 Vite 개발 서버와 adapter-node 프로덕션 환경 모두에서 Socket.io를 통합하는 이중 구조를 설계했습니다.
+
+- **개발**: Vite `configureServer` 훅으로 httpServer에 Socket.io 부착
+- **프로덕션**: 커스텀 `server.js`에서 `build/handler.js` + Socket.io 서버 생성
+
+### 인증 + WebSocket 통합
+
+better-auth 세션 기반 인증과 Socket.io handshake를 연결하여 인증된 사용자만 실시간 채팅에 참여할 수 있는 구조를 구현했습니다. 쿠키 헤더를 `auth.api.getSession()`에 직접 전달하는 방식으로 HTTP 세션과 WebSocket 인증 컨텍스트를 브릿지했습니다.
+
+---
+
 ## 프로젝트 구조
 
 ```
@@ -84,4 +103,7 @@ src/
 │   └── server/          ← 서버 전용 (DB, auth, socket)
 ├── hooks.server.ts      ← better-auth 미들웨어
 └── app.d.ts             ← 타입 선언
+docs/
+├── tech_decision/       ← 기술 선택 배경
+└── rapid-adaptation.md ← Svelte 5 신속 적응 과정
 ```
