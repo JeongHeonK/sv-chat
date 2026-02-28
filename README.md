@@ -73,6 +73,33 @@ pnpm dev
 | `pnpm test`     | 전체 테스트                 |
 | `pnpm format`   | 코드 포맷팅                 |
 
+## Technical Deep Dive
+
+### Svelte 5 Runes 적응
+
+Svelte 5의 Runes 문법(`$state`, `$derived`, `$effect`, `$props`)을 기반으로 반응성 시스템을 구현했습니다. React/Vue 경험과의 멘탈 모델 매핑, Class-based State 패턴으로 도메인 로직을 UI와 분리한 과정은 [Rapid Adaptation](./docs/rapid-adaptation/rapid-adaptation.md)에서 확인할 수 있습니다.
+
+### Socket.io 실시간 통신 설계
+
+SvelteKit의 Vite 개발 서버와 adapter-node 프로덕션 환경 모두에서 Socket.io를 통합하는 이중 구조를 설계했습니다.
+
+- **개발**: Vite `configureServer` 훅으로 httpServer에 Socket.io 부착
+- **프로덕션**: 커스텀 `server.js`에서 `build/handler.js` + Socket.io 서버 생성
+
+### 인증 + WebSocket 통합
+
+better-auth 세션 기반 인증과 Socket.io handshake를 연결하여 인증된 사용자만 실시간 채팅에 참여할 수 있는 구조를 구현했습니다. 쿠키 헤더를 `auth.api.getSession()`에 직접 전달하는 방식으로 HTTP 세션과 WebSocket 인증 컨텍스트를 브릿지했습니다.
+
+### Agent Context 최적화
+
+[Vercel 블로그 분석](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals) 결과를 기반으로 AI 에이전트 컨텍스트를 최적화했습니다.
+
+- **스킬 73% 경량화**: 7개(7,399줄) → 4개(2,007줄). Claude 사전 훈련에 이미 있는 기본 문법 제거, gotcha/패턴만 유지
+- **패시브 인덱싱**: CLAUDE.md에 문서 인덱스 + 기술별 참조 맵 추가. 스킬 자동 트리거(56% 실패) 대신 파일 인덱스 기반 패시브 컨텍스트 주입
+- **Retrieval-led reasoning**: 사전 훈련 데이터보다 프로젝트 내 최신 코드/문서를 우선 탐색하도록 지시문 추가
+
+---
+
 ## 프로젝트 구조
 
 ```
@@ -84,4 +111,7 @@ src/
 │   └── server/          ← 서버 전용 (DB, auth, socket)
 ├── hooks.server.ts      ← better-auth 미들웨어
 └── app.d.ts             ← 타입 선언
+docs/
+├── tech_decision/       ← 기술 선택 배경
+└── rapid-adaptation/   ← Svelte 5 신속 적응 과정
 ```
