@@ -136,6 +136,7 @@ export function getSocket() {
   import { connectSocket } from '$lib/stores/socket.svelte';
   import { onMount, onDestroy } from 'svelte';
 
+  let { roomId } = $props();
   let socket = $state(null);
 
   onMount(() => {
