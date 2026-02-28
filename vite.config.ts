@@ -11,6 +11,9 @@ export default defineConfig({
 		projects: [
 			{
 				extends: './vite.config.ts',
+				optimizeDeps: {
+					include: ['bits-ui', 'tailwind-variants', 'tailwind-merge', 'clsx']
+				},
 				test: {
 					name: 'client',
 					browser: {
