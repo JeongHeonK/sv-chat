@@ -17,17 +17,17 @@
 	let errorId = $derived(`${id}-error`);
 </script>
 
-<div class="space-y-2">
-	<Label for={id}>{label}</Label>
-	<Input
-		{id}
-		{type}
-		{name}
-		{value}
-		aria-invalid={!!error}
-		aria-describedby={error ? errorId : undefined}
-	/>
-	{#if error}
-		<p id={errorId} class="text-sm text-destructive" role="alert">{error}</p>
-	{/if}
+<div class="flex flex-col">
+	<div class="space-y-2">
+		<Label for={id}>{label}</Label>
+		<Input
+			{id}
+			{type}
+			{name}
+			{value}
+			aria-invalid={!!error}
+			aria-describedby={error ? errorId : undefined}
+		/>
+	</div>
+	<p id={errorId} class="text-[10px] font-medium text-destructive min-h-[14px] mt-1" role="alert">{error ?? ''}</p>
 </div>

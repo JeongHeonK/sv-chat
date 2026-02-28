@@ -31,7 +31,7 @@
 		<Card.Description>계정에 로그인하세요.</Card.Description>
 	</Card.Header>
 	<Card.Content>
-		<form method="POST" novalidate onsubmit={handleSubmit} class="space-y-4">
+		<form method="POST" novalidate onsubmit={handleSubmit} class="space-y-2">
 			<FormField
 				id="email"
 				label="이메일"

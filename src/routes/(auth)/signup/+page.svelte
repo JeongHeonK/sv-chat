@@ -33,7 +33,7 @@
 		<Card.Description>새 계정을 만드세요.</Card.Description>
 	</Card.Header>
 	<Card.Content>
-		<form method="POST" novalidate onsubmit={handleSubmit} class="space-y-4">
+		<form method="POST" novalidate onsubmit={handleSubmit} class="space-y-2">
 			<FormField id="name" label="이름" name="name" value={form?.name ?? ''} error={nameError} />
 			<FormField
 				id="email"
