@@ -1,5 +1,6 @@
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vitest/config';
+import { loadEnv } from 'vite';
 import { playwright } from '@vitest/browser-playwright';
 import { sveltekit } from '@sveltejs/kit/vite';
 
@@ -27,6 +28,7 @@ export default defineConfig({
 				test: {
 					name: 'server',
 					environment: 'node',
+					env: loadEnv('', process.cwd(), ''),
 					include: ['src/**/*.{test,spec}.{js,ts}'],
 					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
 				}
