@@ -77,7 +77,7 @@ pnpm dev
 
 ### Svelte 5 Runes 적응
 
-Svelte 5의 Runes 문법(`$state`, `$derived`, `$effect`, `$props`)을 기반으로 반응성 시스템을 구현했습니다. React/Vue 경험과의 멘탈 모델 매핑, Class-based State 패턴으로 도메인 로직을 UI와 분리한 과정은 [Rapid Adaptation](./docs/rapid-adaptation.md)에서 확인할 수 있습니다.
+Svelte 5의 Runes 문법(`$state`, `$derived`, `$effect`, `$props`)을 기반으로 반응성 시스템을 구현했습니다. React/Vue 경험과의 멘탈 모델 매핑, Class-based State 패턴으로 도메인 로직을 UI와 분리한 과정은 [Rapid Adaptation](./docs/rapid-adaptation/rapid-adaptation.md)에서 확인할 수 있습니다.
 
 ### Socket.io 실시간 통신 설계
 
@@ -105,5 +105,5 @@ src/
 └── app.d.ts             ← 타입 선언
 docs/
 ├── tech_decision/       ← 기술 선택 배경
-└── rapid-adaptation.md ← Svelte 5 신속 적응 과정
+└── rapid-adaptation/   ← Svelte 5 신속 적응 과정
 ```
