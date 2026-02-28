@@ -136,6 +136,37 @@ src/
 
 ---
 
+## 9. AI Orchestration: 모델별 강점 기반 분업 개발
+
+각 AI 모델의 강점 영역에 맞춰 작업을 배분하고, Git worktree로 격리된 병렬 개발을 수행한다.
+
+| 역할 | 담당 | 강점 영역 | 작업 범위 |
+|------|------|----------|----------|
+| **Logic** | Claude Opus | 복잡한 로직 설계, 타입 시스템, 서버 아키텍처 | 서버 로직, DB 쿼리, Socket.io, Auth, API |
+| **UI** | Antigravity | UI/UX 구현, 컴포넌트 퍼블리싱, 반응형 디자인 | Svelte 컴포넌트, 레이아웃, 폼, 스타일링 |
+| **Orchestrator** | 개발자 | 아키텍처 의사결정, 코드 리뷰, 통합 검증 | Phase 관리, PR 리뷰, 최종 품질 보증 |
+
+### 워크플로우
+
+```
+Phase별 통합 브랜치 (feat/phase-N-*)
+├── *-logic (Opus worktree)       ← 서버 로직 + API + 타입 정의
+└── *-ui (Antigravity worktree)   ← 컴포넌트 + 스타일 + UX
+```
+
+1. **공유 타입 계약**: Phase 1에서 Opus가 TypeScript 타입/인터페이스 선행 정의
+2. **독립 개발**: Logic/UI가 각자의 worktree에서 Mock 데이터 기반 병렬 작업
+3. **통합 + PR**: Phase별 통합 브랜치에서 merge → main PR → E2E 검증
+
+### 선택 이유
+
+- 각 AI 모델의 강점에 맞는 작업 배분 → 품질 극대화
+- Git worktree 기반 격리 → 충돌 최소화
+- Phase 단위 PR → 점진적 통합 및 검증
+- 개발자가 Orchestrator로서 전체 흐름 제어 → 일관성 보장
+
+---
+
 ## 최종 스택 요약
 
 | 영역         | 선택                           |
