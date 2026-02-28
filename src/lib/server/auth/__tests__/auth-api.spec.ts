@@ -26,9 +26,7 @@ describe('Auth API', () => {
 	});
 
 	it('중복 이메일 가입 실패', async () => {
-		await expect(
-			testAuth.api.signUpEmail({ body: { email, password, name } })
-		).rejects.toThrow();
+		await expect(testAuth.api.signUpEmail({ body: { email, password, name } })).rejects.toThrow();
 	});
 
 	it('존재하지 않는 이메일로 로그인 → 실패', async () => {

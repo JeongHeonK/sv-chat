@@ -25,6 +25,13 @@ export default defineConfig({
 
 			{
 				extends: './vite.config.ts',
+				resolve: {
+					alias: {
+						'$env/dynamic/private': '/src/lib/server/__tests__/mock-env.ts',
+						'$app/server': '/src/lib/server/__tests__/mock-app-server.ts',
+						'$app/environment': '/src/lib/server/__tests__/mock-app-environment.ts'
+					}
+				},
 				test: {
 					name: 'server',
 					environment: 'node',
