@@ -1,12 +1,12 @@
 import { describe, it, expect, afterAll } from 'vitest';
-import { eq, sql } from 'drizzle-orm';
+import { eq, like, sql } from 'drizzle-orm';
 import { testDb, closeConnection } from './setup';
 import { user } from '../auth.schema';
 
 const TEST_EMAIL_PREFIX = 'test-db-conn';
 
 afterAll(async () => {
-	await testDb.delete(user).where(sql`${user.email} LIKE ${TEST_EMAIL_PREFIX + '%'}`);
+	await testDb.delete(user).where(like(user.email, `${TEST_EMAIL_PREFIX}%`));
 	await closeConnection();
 });
 
