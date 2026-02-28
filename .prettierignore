@@ -10,3 +10,4 @@ bun.lockb
 /drizzle/
 .claude/
 scripts/hooks/
+skills-lock.json
