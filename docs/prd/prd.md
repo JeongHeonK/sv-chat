@@ -83,12 +83,12 @@
 
 | Phase | 이름 | Logic (Opus) | UI (Antigravity) | Branch |
 |-------|------|-------------|-------------------|--------|
-| 1 | 프로젝트 초기화 | 01, 02, 03 | — | `feat/phase-1-init` |
+| 1 | 프로젝트 초기화 (Control: 01, 02, 03) | — | — | `feat/phase-1-init` |
 | 2 | 인증 | 04, 05-logic | 05-ui | `feat/phase-2-auth` |
 | 3 | 레이아웃 + 방 목록 | 07-logic | 06, 07-ui | `feat/phase-3-layout` |
 | 4 | 실시간 채팅 | 08, 09~11-logic | 09~11-ui | `feat/phase-4-chat` |
 | 5 | 부가 기능 | 12~13, 15~16-logic | 12~13, 15~16-ui | `feat/phase-5-features` |
-| 6 | E2E + 배포 | 17, 14 | — | `feat/phase-6-deploy` |
+| 6 | E2E + 배포 (Control: 17, 14) | — | — | `feat/phase-6-deploy` |
 
 ## 8. 비기능 요구사항 (Non-Functional Requirements)
 
