@@ -7,7 +7,7 @@ Railway 어플리케이션(Node Custom Server) 배포 검증
 Phase 6 — E2E + 배포
 
 ## Worktree
-Opus 단독
+Control (Main) — Logic/UI 브랜치 병합 후 배포
 
 ## Depends On
 - 08-feat-socket-server
@@ -22,3 +22,5 @@ Railway CLI 배포 또는 GitHub 연동 환경에서의 Docker 빌드 정상화 
 - [ ] Docker 빌드 또는 Nixpacks 빌드 정상 완료
 - [ ] 퍼블릭 URL 접속 시 화면 진입 확인
 - [ ] WSS 소켓 통신 연결 에러 없음
+
+> TDD 비적용 — 인프라/배포 검증 작업

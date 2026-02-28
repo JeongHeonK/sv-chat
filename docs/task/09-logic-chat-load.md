@@ -7,7 +7,7 @@
 Phase 4 — 실시간 채팅
 
 ## Worktree
-logic
+Logic (Opus)
 
 ## Depends On
 - 07-logic-room-list
@@ -17,7 +17,20 @@ logic
 특정 Room ID 라우트 접근 시 DB에서 과거 메시지 fetch 및 Socket.io Room Join 로직.
 
 ## DoD (Definition of Done)
+
+### RED — 실패하는 테스트 작성
+- [ ] `/chat/[roomId]` Load 함수 — 메시지 목록 반환 테스트 (Red)
+- [ ] Socket.io `socket.join(roomId)` 호출 테스트 (Red)
+- [ ] 존재하지 않는 roomId 접근 시 에러 처리 테스트 (Red)
+
+### GREEN — 테스트를 통과하는 최소 구현
 - [ ] `/chat/[roomId]` 라우트 Load 함수에서 메시지 조회 쿼리 구현
 - [ ] Socket.io `socket.join(roomId)` 서버 로직
-- [ ] Message 타입 정의 및 export
-- [ ] Load 함수 및 socket join 테스트 통과
+- [ ] Message 타입 정의 및 export → 테스트 Green 확인
+
+### REFACTOR — 코드 정리
+- [ ] 메시지 쿼리 함수를 서버 모듈로 분리
+- [ ] Message 타입 공유 export 정리
+
+## Sync
+> Message 타입 정의 후 UI worktree에서 타입 참조 가능하도록 브랜치 동기화.

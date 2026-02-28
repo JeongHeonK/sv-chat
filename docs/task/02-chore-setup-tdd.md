@@ -7,7 +7,7 @@ Vitest 및 Playwright 테스트 환경 구축
 Phase 1 — 프로젝트 초기화
 
 ## Worktree
-Opus 단독
+Control (Main)
 
 ## Depends On
 - 01-chore-init-project
@@ -18,5 +18,7 @@ Vitest 설정(컴포넌트 테스트용 `@testing-library/svelte` 포함) 및 �
 ## DoD (Definition of Done)
 - [ ] Vitest + `@testing-library/svelte` 설치 및 설정
 - [ ] Playwright 브라우저 테스트 환경 설정
-- [ ] Dummy 단위 테스트 1개 작성
-- [ ] `pnpm test` 명령어 실행 시 Green(Pass) 확인
+- [ ] `vitest.config.ts` — `requireAssertions: true` 설정
+- [ ] Dummy 단위 테스트 1개 작성 → `pnpm test` Green 확인
+
+> TDD 인프라 구축 태스크 — 이후 모든 태스크의 Red-Green 사이클 기반
