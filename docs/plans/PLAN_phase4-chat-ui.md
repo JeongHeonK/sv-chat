@@ -58,7 +58,7 @@
 { message: ChatMessage, isMine: boolean }
 
 // MessageInput.svelte props
-{ roomId: string, disabled?: boolean }
+{ disabled?: boolean }
 ```
 
 ## 기존 코드 참조
