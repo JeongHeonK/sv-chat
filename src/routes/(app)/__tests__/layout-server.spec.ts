@@ -66,6 +66,6 @@ describe('(app) layout server — 인증 가드', () => {
 		const event = makeEvent(user, session);
 
 		const result = load(event as never);
-		expect(result).toEqual({ user });
+		expect(result).toEqual({ user, rooms: [] });
 	});
 });
