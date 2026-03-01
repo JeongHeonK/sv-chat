@@ -3,9 +3,10 @@ import { defineConfig } from 'vitest/config';
 import { loadEnv } from 'vite';
 import { playwright } from '@vitest/browser-playwright';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { socketDevPlugin } from './src/lib/server/socket/vite-plugin';
 
 export default defineConfig({
-	plugins: [tailwindcss(), sveltekit()],
+	plugins: [tailwindcss(), sveltekit(), socketDevPlugin()],
 	server: { port: 5173, strictPort: true },
 	test: {
 		expect: { requireAssertions: true },
