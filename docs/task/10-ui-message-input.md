@@ -21,11 +21,13 @@ UI (Antigravity)
 - [ ] 입력 폼 요소 렌더링 테스트 — 텍스트 Input + 전송 버튼 존재 (Red)
 - [ ] 엔터키 입력 시 전송 이벤트 발생 테스트 (Red)
 - [ ] 전송 후 입력창 초기화 테스트 (Red)
+- [ ] 전송 중(submitting) 상태에서 전송 버튼 disabled 테스트 (Red)
 
 ### GREEN — 테스트를 통과하는 최소 구현
 - [ ] 메시지 입력 폼 UI 구현 (텍스트 입력 + 전송 버튼)
 - [ ] 엔터키 전송 지원
 - [ ] 전송 후 입력창 초기화 → 테스트 Green 확인
+- [ ] SvelteKit `use:enhance` 기반 submitting 상태 관리 — 전송 중 버튼 disabled 처리
 
 ### REFACTOR — 코드 정리
 - [ ] 접근성 속성 점검 (aria-label, role)
