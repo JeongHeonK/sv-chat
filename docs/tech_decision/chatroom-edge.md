@@ -55,5 +55,5 @@ Gemini 리뷰 기반 엣지 케이스 분석. 수용/보류 판단 근거 포함
 |------|----------|
 | Optimistic UI | Form Action 기반 → 서버 응답 후 표시가 기본. PRD "1초 이내" 충족 시 UX 차이 미미 |
 | 재전송 버튼 UI | 과제 규모에서 과도. 에러 toast로 충분 |
-| Rate Limiting (도배 방지) | 1:1 채팅에서 DoS 방어 과도. 전송 중 disable로 기본 방지 |
+| Rate Limiting (도배 방지) | 1:1 채팅에서는 심각한 도배 문제 발생 가능성이 낮다고 판단. 중복 전송 방지에 집중 |
 | 읽음 확인 (Read Receipt) | PRD에 명시 없음. unread count(Task 15)로 간접 처리 |

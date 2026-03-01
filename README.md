@@ -15,7 +15,6 @@ SvelteKit 5 기반 1:1 실시간 채팅 웹 애플리케이션
 | Deploy    | Railway (adapter-node)         |
 
 > 기술 선택 배경은 [Tech Decision](./docs/tech_decision/tech_decision.md) 참고
->
 > 엣지 케이스 대응 전략은 [Chatroom Edge Cases](./docs/tech_decision/chatroom-edge.md) 참고
 
 ## 시작하기
