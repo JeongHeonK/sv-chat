@@ -9,7 +9,7 @@ import { pgTable, text, timestamp, index } from 'drizzle-orm/pg-core';
 import { and, gt, eq, asc } from 'drizzle-orm';
 
 // --- Event constants (keep in sync with src/lib/server/socket/events.ts) ---
-const SOCKET_EVENTS = { SYNC: 'sync', JOIN_ROOM: 'join_room' };
+const SOCKET_EVENTS = { SYNC: 'sync', JOIN_ROOM: 'join_room', MESSAGE_CREATED: 'message_created' };
 
 // --- Schema (keep in sync with src/lib/server/db/chat.schema.ts) ---
 const messageTable = pgTable(
@@ -49,6 +49,8 @@ const httpServer = createServer(handler);
 
 // --- Socket.io ---
 const io = new Server(httpServer);
+// keep in sync with src/lib/server/socket/io.ts GLOBAL_KEY
+globalThis.__svChatSocketIO = io;
 
 io.use(async (socket, next) => {
 	const cookie = socket.handshake.headers.cookie;

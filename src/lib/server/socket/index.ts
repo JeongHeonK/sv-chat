@@ -9,6 +9,7 @@ import {
 	type CheckMembershipFn
 } from './sync';
 import { createJoinHandler } from './join';
+import { setIO } from './io';
 import type { SessionResult } from '$lib/server/auth/session';
 import type { Database } from '$lib/server/db';
 
@@ -22,6 +23,7 @@ interface SocketServerDeps {
 
 export function setupSocketServer(httpServer: HttpServer, deps: SocketServerDeps): SocketIOServer {
 	const io = new SocketIOServer(httpServer);
+	setIO(io);
 
 	io.use(createAuthMiddleware(deps.authApi));
 
