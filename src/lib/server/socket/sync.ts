@@ -3,6 +3,7 @@ import { and, gt, eq, asc } from 'drizzle-orm';
 import { message, roomUser, type Message } from '$lib/server/db/chat.schema';
 import type { Database } from '$lib/server/db';
 import { SOCKET_EVENTS } from './events';
+import { getUserId } from './types';
 
 type SyncPayload = {
 	roomId: string;
@@ -44,7 +45,7 @@ export function createSyncHandler(deps: SyncHandlerDeps) {
 			SOCKET_EVENTS.SYNC,
 			async (payload: SyncPayload, callback: (messages: Message[]) => void) => {
 				try {
-					const userId = (socket.data.user as { id: string }).id;
+					const userId = getUserId(socket);
 					const isMember = await deps.checkMembership(userId, payload.roomId);
 					if (!isMember) {
 						if (typeof callback === 'function') callback([]);
