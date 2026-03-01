@@ -2,7 +2,7 @@ import type { Socket } from 'socket.io';
 import { and, gt, eq, asc } from 'drizzle-orm';
 import { message, roomUser, type Message } from '$lib/server/db/chat.schema';
 import type { Database } from '$lib/server/db';
-import { SOCKET_EVENTS } from './events';
+import { SOCKET_EVENTS } from '$lib/socket-events';
 import { getUserId } from './types';
 
 type SyncPayload = {

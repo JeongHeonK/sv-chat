@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 import type { Server as SocketIOServer } from 'socket.io';
 import { message, type Message } from '$lib/server/db/chat.schema';
 import type { Database } from '$lib/server/db';
-import { SOCKET_EVENTS } from '$lib/server/socket/events';
+import { SOCKET_EVENTS } from '$lib/socket-events';
 
 interface SaveMessageParams {
 	roomId: string;

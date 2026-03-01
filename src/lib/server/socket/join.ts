@@ -1,5 +1,5 @@
 import type { Socket } from 'socket.io';
-import { SOCKET_EVENTS } from './events';
+import { SOCKET_EVENTS } from '$lib/socket-events';
 import { getUserId } from './types';
 import type { CheckMembershipFn } from './sync';
 

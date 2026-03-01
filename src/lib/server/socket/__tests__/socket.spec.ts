@@ -6,7 +6,7 @@ import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { createAuthMiddleware } from '../auth';
 import { createSyncHandler } from '../sync';
 import { createJoinHandler } from '../join';
-import { SOCKET_EVENTS } from '../events';
+import { SOCKET_EVENTS } from '$lib/socket-events';
 import type { Message } from '$lib/server/db/chat.schema';
 import type { SessionResult } from '$lib/server/auth/session';
 
