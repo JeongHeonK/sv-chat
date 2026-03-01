@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { index, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { user } from './auth.schema';
 
 export const room = pgTable('room', {
@@ -18,17 +18,21 @@ export const roomUser = pgTable('room_user', {
 	joinedAt: timestamp('joined_at').notNull().defaultNow()
 });
 
-export const message = pgTable('message', {
-	id: text('id').primaryKey(),
-	roomId: text('room_id')
-		.notNull()
-		.references(() => room.id, { onDelete: 'cascade' }),
-	senderId: text('sender_id')
-		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' }),
-	content: text('content').notNull(),
-	createdAt: timestamp('created_at').notNull().defaultNow()
-});
+export const message = pgTable(
+	'message',
+	{
+		id: text('id').primaryKey(),
+		roomId: text('room_id')
+			.notNull()
+			.references(() => room.id, { onDelete: 'cascade' }),
+		senderId: text('sender_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		content: text('content').notNull(),
+		createdAt: timestamp('created_at').notNull().defaultNow()
+	},
+	(t) => [index('idx_message_room_created').on(t.roomId, t.createdAt.desc())]
+);
 
 export type Room = typeof room.$inferSelect;
 export type NewRoom = typeof room.$inferInsert;

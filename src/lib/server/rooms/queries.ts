@@ -15,21 +15,27 @@ export async function getUserRooms(
 	db: PostgresJsDatabase<typeof schema>,
 	userId: string
 ): Promise<RoomWithLastMessage[]> {
-	// 서브쿼리: roomId별 최신 메시지
-	const lastMessageSq = db
+	// 서브쿼리: ROW_NUMBER()로 방별 최신 메시지 1건 추출
+	const rankedMessages = db
 		.select({
 			roomId: message.roomId,
 			content: message.content,
-			createdAt: message.createdAt
+			createdAt: message.createdAt,
+			rn: sql<number>`row_number() over (partition by ${message.roomId} order by ${message.createdAt} desc)`.as(
+				'rn'
+			)
 		})
 		.from(message)
-		.where(
-			sql`${message.createdAt} = (
-				SELECT MAX(m2.created_at)
-				FROM message m2
-				WHERE m2.room_id = ${message.roomId}
-			)`
-		)
+		.as('ranked_messages');
+
+	const lastMessageSq = db
+		.select({
+			roomId: rankedMessages.roomId,
+			content: rankedMessages.content,
+			createdAt: rankedMessages.createdAt
+		})
+		.from(rankedMessages)
+		.where(sql`${rankedMessages.rn} = 1`)
 		.as('last_msg');
 
 	// 유저가 참여한 방 + 상대방 정보 + 최신 메시지 JOIN
