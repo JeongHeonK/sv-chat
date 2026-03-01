@@ -1,3 +1,11 @@
+export function formatMessageTime(isoString: string): string {
+	const date = new Date(isoString);
+	if (isNaN(date.getTime())) return '';
+	const hours = date.getHours();
+	const minutes = date.getMinutes().toString().padStart(2, '0');
+	return `${hours}:${minutes}`;
+}
+
 export function formatRelativeTime(date: Date | null): string {
 	if (!date) return '';
 

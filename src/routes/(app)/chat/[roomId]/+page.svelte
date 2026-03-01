@@ -3,7 +3,10 @@
 	import type { PageProps } from './$types';
 	import { createMessageStore } from '$lib/chat/message-store.svelte';
 	import { createSocketConnection } from '$lib/socket';
+	import { autoScroll } from '$lib/chat/auto-scroll';
 	import type { ChatMessage } from '$lib/types/chat';
+	import MessageList from '$lib/components/message-list.svelte';
+	import MessageInput from '$lib/components/message-input.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -33,12 +36,10 @@
 
 <div class="flex h-full flex-col">
 	<h2 class="border-b p-4 text-lg font-semibold">채팅방</h2>
-	<div class="flex-1 overflow-y-auto p-4">
-		{#each messageStore.messages as msg (msg.id)}
-			<div class="mb-2">
-				<span class="font-medium">{msg.senderName || '알 수 없음'}</span>
-				<p>{msg.content}</p>
-			</div>
-		{/each}
+	<div class="flex-1 overflow-y-auto" use:autoScroll>
+		<MessageList messages={messageStore.messages} currentUserId={data.currentUserId} />
+	</div>
+	<div class="border-t p-4">
+		<MessageInput />
 	</div>
 </div>
