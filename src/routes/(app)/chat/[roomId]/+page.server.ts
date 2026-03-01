@@ -17,7 +17,7 @@ export const load: PageServerLoad = async (event) => {
 		before: before ? new Date(before) : undefined
 	});
 
-	return { messages, roomId };
+	return { messages, roomId, currentUserId: userId };
 };
 
 export const actions: Actions = {
