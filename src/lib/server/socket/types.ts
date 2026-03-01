@@ -7,5 +7,7 @@ export interface AuthenticatedSocketData {
 }
 
 export function getUserId(socket: Socket): string {
-	return (socket.data as AuthenticatedSocketData).user.id;
+	const data = socket.data as Partial<AuthenticatedSocketData>;
+	if (!data?.user?.id) throw new Error('Unauthenticated socket');
+	return data.user.id;
 }

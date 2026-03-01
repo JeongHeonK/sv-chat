@@ -29,6 +29,7 @@ export const actions: Actions = {
 		const formData = await event.request.formData();
 		const content = String(formData.get('content') ?? '').trim();
 		if (!content) return fail(400, { error: 'Message cannot be empty' });
+		if (content.length > 5000) return fail(400, { error: 'Message too long' });
 
 		await assertRoomMember(db, userId, roomId);
 

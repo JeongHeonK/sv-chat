@@ -22,7 +22,9 @@ interface SocketServerDeps {
 }
 
 export function setupSocketServer(httpServer: HttpServer, deps: SocketServerDeps): SocketIOServer {
-	const io = new SocketIOServer(httpServer);
+	const io = new SocketIOServer(httpServer, {
+		cors: { origin: process.env.ORIGIN, credentials: true }
+	});
 	setIO(io);
 
 	io.use(createAuthMiddleware(deps.authApi));

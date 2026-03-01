@@ -48,7 +48,9 @@ const auth = betterAuth({
 const httpServer = createServer(handler);
 
 // --- Socket.io ---
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+	cors: { origin: process.env.ORIGIN, credentials: true }
+});
 // keep in sync with src/lib/server/socket/io.ts GLOBAL_KEY
 globalThis.__svChatSocketIO = io;
 
@@ -79,8 +81,13 @@ async function checkMembership(userId, roomId) {
 
 io.on('connection', (socket) => {
 	// Join room handler
-	socket.on(SOCKET_EVENTS.JOIN_ROOM, async ({ roomId }, callback) => {
+	socket.on(SOCKET_EVENTS.JOIN_ROOM, async (payload, callback) => {
 		try {
+			if (typeof payload?.roomId !== 'string') {
+				if (typeof callback === 'function') callback(false);
+				return;
+			}
+			const { roomId } = payload;
 			const isMember = await checkMembership(socket.data.user.id, roomId);
 			if (isMember) {
 				await socket.join(roomId);
@@ -93,8 +100,23 @@ io.on('connection', (socket) => {
 		}
 	});
 
-	socket.on(SOCKET_EVENTS.SYNC, async ({ roomId, lastMessageTimestamp }, callback) => {
+	socket.on(SOCKET_EVENTS.SYNC, async (payload, callback) => {
 		try {
+			if (
+				typeof payload?.roomId !== 'string' ||
+				typeof payload?.lastMessageTimestamp !== 'string'
+			) {
+				if (typeof callback === 'function') callback([]);
+				return;
+			}
+			const { roomId, lastMessageTimestamp } = payload;
+
+			const since = new Date(lastMessageTimestamp);
+			if (isNaN(since.getTime())) {
+				if (typeof callback === 'function') callback([]);
+				return;
+			}
+
 			const isMember = await checkMembership(socket.data.user.id, roomId);
 			if (!isMember) {
 				if (typeof callback === 'function') callback([]);
@@ -104,12 +126,7 @@ io.on('connection', (socket) => {
 			const messages = await db
 				.select()
 				.from(messageTable)
-				.where(
-					and(
-						eq(messageTable.roomId, roomId),
-						gt(messageTable.createdAt, new Date(lastMessageTimestamp))
-					)
-				)
+				.where(and(eq(messageTable.roomId, roomId), gt(messageTable.createdAt, since)))
 				.orderBy(asc(messageTable.createdAt));
 
 			if (typeof callback === 'function') callback(messages);

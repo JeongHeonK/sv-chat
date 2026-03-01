@@ -10,6 +10,12 @@ type SyncPayload = {
 	lastMessageTimestamp: string;
 };
 
+function isValidSyncPayload(data: unknown): data is SyncPayload {
+	if (typeof data !== 'object' || data === null) return false;
+	const obj = data as Record<string, unknown>;
+	return typeof obj.roomId === 'string' && typeof obj.lastMessageTimestamp === 'string';
+}
+
 export type QueryMessagesFn = (roomId: string, since: Date) => Promise<Message[]>;
 export type CheckMembershipFn = (userId: string, roomId: string) => Promise<boolean>;
 
@@ -43,8 +49,19 @@ export function createSyncHandler(deps: SyncHandlerDeps) {
 	return (socket: Socket) => {
 		socket.on(
 			SOCKET_EVENTS.SYNC,
-			async (payload: SyncPayload, callback: (messages: Message[]) => void) => {
+			async (payload: unknown, callback: (messages: Message[]) => void) => {
 				try {
+					if (!isValidSyncPayload(payload)) {
+						if (typeof callback === 'function') callback([]);
+						return;
+					}
+
+					const since = new Date(payload.lastMessageTimestamp);
+					if (isNaN(since.getTime())) {
+						if (typeof callback === 'function') callback([]);
+						return;
+					}
+
 					const userId = getUserId(socket);
 					const isMember = await deps.checkMembership(userId, payload.roomId);
 					if (!isMember) {
@@ -52,10 +69,7 @@ export function createSyncHandler(deps: SyncHandlerDeps) {
 						return;
 					}
 
-					const messages = await deps.queryMessages(
-						payload.roomId,
-						new Date(payload.lastMessageTimestamp)
-					);
+					const messages = await deps.queryMessages(payload.roomId, since);
 					if (typeof callback === 'function') callback(messages);
 				} catch {
 					if (typeof callback === 'function') callback([]);

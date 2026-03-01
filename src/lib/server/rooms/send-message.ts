@@ -12,7 +12,7 @@ interface SaveMessageParams {
 
 export async function saveMessage(db: Database, params: SaveMessageParams): Promise<Message> {
 	const id = crypto.randomUUID();
-	const [saved] = await db
+	const rows = await db
 		.insert(message)
 		.values({
 			id,
@@ -22,6 +22,8 @@ export async function saveMessage(db: Database, params: SaveMessageParams): Prom
 			createdAt: sql`now()`
 		})
 		.returning();
+	const saved = rows[0];
+	if (!saved) throw new Error('Failed to insert message');
 	return saved;
 }
 
