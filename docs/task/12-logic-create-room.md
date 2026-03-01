@@ -20,13 +20,14 @@ Logic (Opus)
 ### RED — 실패하는 테스트 작성
 - [ ] 사용자 검색 API — 닉네임/이메일 기반 결과 반환 테스트 (Red)
 - [ ] 1:1 Room + RoomUser 생성 후 DB Row 존재 확인 테스트 (Red)
-- [ ] 이미 존재하는 1:1 대화방 중복 생성 방지 테스트 (Red)
+- [ ] 이미 존재하는 1:1 대화방 중복 생성 방지 테스트 — 동시 요청 시에도 1개만 생성 확인 (Red)
 
 ### GREEN — 테스트를 통과하는 최소 구현
 - [ ] 사용자 검색 API 엔드포인트 구현 (닉네임/이메일 기반)
 - [ ] 1:1 Room 생성 + RoomUser 관계 Insert 로직
 - [ ] 중복 대화방 체크 로직 → 테스트 Green 확인
+- [ ] 참여자 조합 식별자(participantHash)에 DB Unique 제약 추가 — race condition 방지
 
 ### REFACTOR — 코드 정리
 - [ ] 검색 쿼리 최적화 (인덱스 검토)
-- [ ] Room 생성 로직 트랜잭션 래핑
+- [ ] Room 생성 로직 트랜잭션 래핑 — unique violation 시 기존 방 반환 (upsert 패턴)
