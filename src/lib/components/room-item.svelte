@@ -12,6 +12,7 @@
 >
 	<div
 		class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-medium text-primary"
+		aria-hidden="true"
 	>
 		{room.name.charAt(0)}
 	</div>
@@ -19,7 +20,9 @@
 		<div class="flex items-center justify-between">
 			<span class="text-sm font-medium">{room.name}</span>
 			{#if room.lastMessageAt}
-				<span class="text-xs text-muted-foreground">{formatRelativeTime(room.lastMessageAt)}</span>
+				<time class="text-xs text-muted-foreground" datetime={room.lastMessageAt.toISOString()}
+					>{formatRelativeTime(room.lastMessageAt)}</time
+				>
 			{/if}
 		</div>
 		{#if room.lastMessage}
