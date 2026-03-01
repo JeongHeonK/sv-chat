@@ -4,6 +4,7 @@ export interface ChatMessage {
 	senderId: string;
 	content: string;
 	createdAt: string;
+	senderName?: string;
 }
 
 interface RawSocketMessage {
