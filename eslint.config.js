@@ -12,7 +12,7 @@ const gitignorePath = path.resolve(import.meta.dirname, '.gitignore');
 
 export default defineConfig(
 	includeIgnoreFile(gitignorePath),
-	{ ignores: ['scripts/hooks/', 'src/lib/components/ui/'] },
+	{ ignores: ['scripts/hooks/', 'src/lib/components/ui/', '.claude/', '.claire/'] },
 	js.configs.recommended,
 	...ts.configs.recommended,
 	...svelte.configs.recommended,
