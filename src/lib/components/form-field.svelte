@@ -29,5 +29,7 @@
 			aria-describedby={error ? errorId : undefined}
 		/>
 	</div>
-	<p id={errorId} class="text-[10px] font-medium text-destructive min-h-[14px] mt-1" role="alert">{error ?? ''}</p>
+	<p id={errorId} class="mt-1 min-h-[14px] text-[10px] font-medium text-destructive" role="alert">
+		{error ?? ''}
+	</p>
 </div>
