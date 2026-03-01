@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button } from '$ui/button';
+	import { authClient } from '$lib/auth-client';
 
 	let { userName }: { userName?: string } = $props();
 </script>
@@ -14,8 +15,13 @@
 			variant="ghost"
 			size="sm"
 			onclick={async () => {
-				await fetch('/api/auth/sign-out', { method: 'POST' });
-				window.location.href = '/login';
+				await authClient.signOut({
+					fetchOptions: {
+						onSuccess: () => {
+							window.location.href = '/login';
+						}
+					}
+				});
 			}}
 		>
 			로그아웃

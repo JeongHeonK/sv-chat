@@ -6,13 +6,14 @@ import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
+	server: { port: 5173, strictPort: true },
 	test: {
 		expect: { requireAssertions: true },
 		projects: [
 			{
 				extends: './vite.config.ts',
 				optimizeDeps: {
-					include: ['bits-ui', 'tailwind-variants', 'tailwind-merge', 'clsx']
+					include: ['bits-ui', 'tailwind-variants', 'tailwind-merge', 'clsx', 'better-auth/svelte']
 				},
 				test: {
 					name: 'client',
