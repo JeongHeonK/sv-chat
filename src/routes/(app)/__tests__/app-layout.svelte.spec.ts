@@ -16,7 +16,7 @@ describe('App Shell Layout — 구조', () => {
 
 		const sidebar = container.querySelector('aside')!;
 		expect(sidebar.classList.contains('hidden')).toBe(true);
-		expect(sidebar.classList.contains('md:block')).toBe(true);
+		expect(sidebar.classList.contains('md:flex')).toBe(true);
 	});
 
 	it('Main 영역에 flex-1이 적용되어 나머지 공간을 채운다', async () => {
