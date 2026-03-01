@@ -36,15 +36,23 @@ describe('validatePassword', () => {
 	});
 
 	it('8자 미만 → 에러 반환', () => {
-		expect(validatePassword('1234567')).not.toBeNull();
+		expect(validatePassword('abc123')).not.toBeNull();
 	});
 
-	it('경계값: 정확히 8자 → 통과', () => {
-		expect(validatePassword('12345678')).toBeNull();
+	it('숫자만 → 에러 반환', () => {
+		expect(validatePassword('12345678')).not.toBeNull();
+	});
+
+	it('영문만 → 에러 반환', () => {
+		expect(validatePassword('abcdefgh')).not.toBeNull();
+	});
+
+	it('경계값: 영문+숫자 정확히 8자 → 통과', () => {
+		expect(validatePassword('abcd1234')).toBeNull();
 	});
 
 	it('정상 비밀번호 → null 반환', () => {
-		expect(validatePassword('securepassword')).toBeNull();
+		expect(validatePassword('secure1pass')).toBeNull();
 	});
 });
 
@@ -77,7 +85,7 @@ describe('validateLoginForm', () => {
 	});
 
 	it('모든 필드 유효 → 에러 없음', () => {
-		const result = validateLoginForm({ email: 'user@example.com', password: 'securepass' });
+		const result = validateLoginForm({ email: 'user@example.com', password: 'secure1pass' });
 		expect(result.email).toBeNull();
 		expect(result.password).toBeNull();
 	});
@@ -94,7 +102,7 @@ describe('validateSignUpForm', () => {
 	it('일부 필드만 유효 → 해당 필드만 에러', () => {
 		const result = validateSignUpForm({
 			email: 'user@example.com',
-			password: 'securepass',
+			password: 'secure1pass',
 			name: ''
 		});
 		expect(result.email).toBeNull();
@@ -105,7 +113,7 @@ describe('validateSignUpForm', () => {
 	it('모든 필드 유효 → 에러 없음', () => {
 		const result = validateSignUpForm({
 			email: 'user@example.com',
-			password: 'securepass',
+			password: 'secure1pass',
 			name: '홍길동'
 		});
 		expect(result.email).toBeNull();

@@ -9,6 +9,8 @@ export function validateEmail(email: string): string | null {
 export function validatePassword(password: string): string | null {
 	if (!password) return '비밀번호를 입력해 주세요.';
 	if (password.length < 8) return '비밀번호는 8자 이상이어야 합니다.';
+	if (!/[A-Za-z]/.test(password)) return '비밀번호에 영문자를 포함해 주세요.';
+	if (!/\d/.test(password)) return '비밀번호에 숫자를 포함해 주세요.';
 	return null;
 }
 

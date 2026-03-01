@@ -25,3 +25,4 @@ vite.config.ts.timestamp-*
 # Claude Code
 .claude/context/
 .claude/learnings/
+.claude/worktrees/

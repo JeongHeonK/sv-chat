@@ -9,7 +9,7 @@
 <div class="flex h-screen flex-col">
 	<Gnb userName={data.user.name} />
 	<div class="flex flex-1 overflow-hidden">
-		<Sidebar />
+		<Sidebar rooms={data.rooms ?? []} />
 		<main class="flex-1 overflow-y-auto p-4">
 			{@render children()}
 		</main>
