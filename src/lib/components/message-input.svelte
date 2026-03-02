@@ -9,21 +9,26 @@
 	let submitting = $state(false);
 
 	const canSend = $derived(content.trim().length > 0 && !disabled && !submitting);
-</script>
 
-<form
-	method="POST"
-	use:enhance={() => {
+	function handleEnhance() {
 		submitting = true;
-		return async ({ result, update }) => {
+		return async ({
+			result,
+			update
+		}: {
+			result: { type: string };
+			update: () => Promise<void>;
+		}) => {
 			await update();
 			if (result.type === 'success') {
 				content = '';
 			}
 			submitting = false;
 		};
-	}}
->
+	}
+</script>
+
+<form method="POST" use:enhance={handleEnhance}>
 	<div class="flex items-center gap-2">
 		<label for="message-input" class="sr-only">메시지 입력</label>
 		<Input

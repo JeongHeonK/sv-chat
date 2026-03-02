@@ -40,6 +40,12 @@
 		debouncedSearch(query);
 	}
 
+	function handleUserKeydown(e: KeyboardEvent, user: SearchUserResult) {
+		if (e.key === 'Enter') {
+			selectUser(user);
+		}
+	}
+
 	async function selectUser(user: SearchUserResult) {
 		const res = await fetch('/api/rooms', {
 			method: 'POST',
@@ -84,7 +90,7 @@
 					aria-selected="false"
 					class="cursor-pointer px-3 py-2 hover:bg-accent"
 					onclick={() => selectUser(user)}
-					onkeydown={(e) => e.key === 'Enter' && selectUser(user)}
+					onkeydown={(e) => handleUserKeydown(e, user)}
 					tabindex="0"
 				>
 					<div class="text-sm font-medium">{user.name}</div>

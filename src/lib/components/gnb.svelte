@@ -3,6 +3,16 @@
 	import { authClient } from '$lib/auth-client';
 
 	let { userName }: { userName?: string } = $props();
+
+	async function handleLogout() {
+		await authClient.signOut({
+			fetchOptions: {
+				onSuccess: () => {
+					window.location.href = '/login';
+				}
+			}
+		});
+	}
 </script>
 
 <header class="flex h-14 shrink-0 items-center justify-between border-b bg-background px-4">
@@ -11,20 +21,6 @@
 		{#if userName}
 			<span class="text-sm text-muted-foreground">{userName}</span>
 		{/if}
-		<Button
-			variant="ghost"
-			size="sm"
-			onclick={async () => {
-				await authClient.signOut({
-					fetchOptions: {
-						onSuccess: () => {
-							window.location.href = '/login';
-						}
-					}
-				});
-			}}
-		>
-			로그아웃
-		</Button>
+		<Button variant="ghost" size="sm" onclick={handleLogout}>로그아웃</Button>
 	</div>
 </header>
