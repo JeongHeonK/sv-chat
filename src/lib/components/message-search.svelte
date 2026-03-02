@@ -3,12 +3,14 @@
 	import { goto } from '$app/navigation';
 	import { debounce } from '$lib/utils/debounce';
 	import { highlightMatches } from '$lib/utils/highlight';
-	import type { SearchMessagesResult } from '$lib/types/search';
+	import type { SearchMessageItem, SearchMessagesResponse } from '$lib/types/search';
 
 	const PAGE_SIZE = 20;
 
+	let { isSearching = $bindable(false) } = $props();
+
 	let query = $state('');
-	let results = $state<SearchMessagesResult[]>([]);
+	let results = $state<SearchMessageItem[]>([]);
 	let showResults = $state(false);
 	let searched = $state(false);
 	let hasMore = $state(false);
@@ -35,16 +37,16 @@
 		);
 
 		if (res.ok) {
-			const data: SearchMessagesResult[] = await res.json();
+			const data: SearchMessagesResponse = await res.json();
 			if (searchOffset === 0) {
-				results = data;
+				results = data.messages;
 			} else {
-				results = [...results, ...data];
+				results = [...results, ...data.messages];
 			}
 			showResults = true;
 			searched = true;
-			hasMore = data.length >= PAGE_SIZE;
-			offset = searchOffset + data.length;
+			hasMore = searchOffset + data.messages.length < data.total;
+			offset = searchOffset + data.messages.length;
 			currentQuery = q;
 		}
 	}
@@ -60,11 +62,11 @@
 		debouncedSearch(query);
 	}
 
-	function selectMessage(msg: SearchMessagesResult) {
+	function selectMessage(msg: SearchMessageItem) {
 		goto(`/chat/${msg.roomId}`);
 	}
 
-	function handleResultKeydown(e: KeyboardEvent, msg: SearchMessagesResult) {
+	function handleResultKeydown(e: KeyboardEvent, msg: SearchMessageItem) {
 		if (e.key === 'Enter') {
 			selectMessage(msg);
 		}
@@ -73,15 +75,19 @@
 	function loadMore() {
 		search(currentQuery, offset);
 	}
+
+	$effect(() => {
+		isSearching = query.trim().length > 0;
+	});
 </script>
 
-<div class="relative">
+<div class="flex h-full flex-col">
 	<input
 		type="text"
 		placeholder="메시지 검색..."
 		bind:value={query}
 		oninput={handleInput}
-		class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+		class="mt-1 w-full shrink-0 rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:outline-none"
 		role="combobox"
 		aria-expanded={showResults}
 		aria-controls="message-search-listbox"
@@ -91,7 +97,7 @@
 		<ul
 			id="message-search-listbox"
 			role="listbox"
-			class="absolute z-50 mt-1 max-h-80 w-full overflow-auto rounded-md border bg-popover shadow-md"
+			class="mt-2 flex-1 overflow-y-auto rounded-md border bg-popover"
 		>
 			{#if results.length === 0 && searched}
 				<li class="px-3 py-2 text-sm text-muted-foreground">검색 결과가 없습니다</li>
@@ -132,5 +138,7 @@
 				</li>
 			{/if}
 		</ul>
+	{:else if !query.trim()}
+		<p class="mt-4 text-center text-sm text-muted-foreground">검색어를 입력하세요</p>
 	{/if}
 </div>
