@@ -10,7 +10,7 @@
 - [ ] Fix 4: 메시지 전송 후 최하단 자동 스크롤
 - [ ] Feat 5: 채팅방 나가기 (목록에서 제거)
 - [ ] Feat 6: 채팅방 삭제
-- [ ] Feat 7: 채팅방 제목 변경
+- [ ] Feat 7: 비어있는 화면 대응 (Empty State UI)
 
 ---
 
@@ -22,7 +22,7 @@
 
 **수정 파일**: `src/routes/(auth)/login/+page.svelte`
 
-**방법**: 런타임 확인 후 필요 시 — form에 `use:enhance` 도입 또는 password Input에 Enter keydown 핸들러 추가.
+**방법**: 런타임 확인 후 필요 시 — form에 `use:enhance` 도입 또는 password Input에 Enter keydown 핸들러 추가. (※ 회원가입 폼 등 다른 화면의 폼에서도 동일하게 Enter가 동작하지 않는지 함께 점검)
 
 ---
 
@@ -66,6 +66,7 @@ import { invalidate } from '$app/navigation';
 
 **단축키**: `Escape` → 입력칸 포커스 + 하단 스크롤
 **안내**: 스크롤 시 "↓ Esc로 최신 메시지로 이동" 플로팅 표시
+**모바일 대응**: 컴팩트한 화면 및 터치 기반 환경을 위해 스크롤을 올렸을 때 우측 하단에 "⬇︎ 최근 메시지 보기" 플로팅 버튼 아이콘 추가 (클릭 시 포커스 + 하단 이동)
 
 **핵심 변경**:
 ```svelte
@@ -108,6 +109,8 @@ let { onSend, ... } = $props();
 // onSend={() => scrollRef.scrollToBottom()} 전달
 ```
 
+**UX 고려사항**: 내가 스크롤을 올려둔 상태(`isAtBottom = false`)에서 '상대방의 새 메시지'가 수신되었을 경우 스크롤을 바닥으로 강제 이동하지 않고 유지. 대신 "⬇︎ 최근 메시지 보기" 플로팅 버튼에 새 메시지 N건을 알리는 빨간색 뱃지 노출.
+
 ---
 
 ## Feat 5: 채팅방 나가기 (목록에서 제거)
@@ -115,6 +118,7 @@ let { onSend, ... } = $props();
 **증상**: 채팅방을 더 이상 보고 싶지 않은데 목록에서 숨기거나 나갈 방법이 없음.
 
 **설계**: 1:1 채팅이므로 "나가기" = `roomUser` 레코드 삭제. 양쪽 모두 나가면 room 자체 삭제.
+**UX 고려사항**: 상대방이 방을 나간 경우, 남은 사용자의 화면에 "(알 수 없음)님이 채팅방을 나갔습니다." 형태의 시스템 메시지 노출 및 메시지 입력란 `disabled` 처리하여 추가 전송 방지.
 
 **수정 파일**:
 - `src/lib/server/rooms/leave-room.ts` — 새 파일: `leaveRoom(db, userId, roomId)` 함수
@@ -171,35 +175,11 @@ export async function deleteRoom(db: Database, roomId: string) {
 
 ---
 
-## Feat 7: 채팅방 제목 변경
+## Feat 7: 비어있는 화면 대응 (Empty State UI)
 
-**증상**: 채팅방 이름이 상대방 이름으로 고정되어 사용자가 구분하기 어려움.
-
-**설계**: `roomUser` 테이블에 `customName` 컬럼 추가. 사용자별로 다른 이름 설정 가능. `null`이면 기존 로직(상대방 이름) 유지.
-
-**수정 파일**:
-- `src/lib/server/db/chat.schema.ts` — `roomUser`에 `customName` 컬럼 추가
-- DB 마이그레이션 — `ALTER TABLE room_user ADD COLUMN custom_name TEXT`
-- `src/lib/server/rooms/queries.ts` — `getUserRooms()` 쿼리에서 `customName ?? user.name` 반환
-- `src/routes/api/rooms/[roomId]/+server.ts` — `PATCH /api/rooms/[roomId]` 엔드포인트 추가
-- `src/lib/components/room-item.svelte` — 이름 편집 UI (클릭 → 인라인 편집 또는 모달)
-- `src/routes/(app)/chat/[roomId]/+page.svelte` — 채팅방 헤더에서도 제목 편집 가능
-
-**핵심 변경**:
-```typescript
-// chat.schema.ts
-export const roomUser = pgTable('room_user', {
-  // ... 기존 컬럼
-  customName: text('custom_name'), // nullable — null이면 상대방 이름 사용
-});
-
-// queries.ts — getUserRooms()
-// COALESCE(roomUser.customName, otherUser.name) AS name
-
-// PATCH /api/rooms/[roomId]
-// body: { customName: "새 이름" }
-// → roomUser.customName 업데이트
-```
+**설계**:
+- **사이드바**: 나의 채팅 목록이 하나도 없을 때 빈 화면 대신 *"아직 대화가 없습니다."* 등 안내 문구 노출
+- **채팅방**: 방에 처음 진입했으나 아직 메시지를 1건도 주고받지 않은 상태일 때 중앙에 *"건강한 대화를 나눠보세요"* 등 텍스트나 플레이스홀더 노출
 
 ---
 
@@ -210,27 +190,24 @@ export const roomUser = pgTable('room_user', {
 | `src/routes/(auth)/login/+page.svelte` | Enter 키 submit 검증/수정 |
 | `src/routes/(app)/chat/[roomId]/+page.server.ts` | `updateLastReadAt()` 호출 |
 | `src/routes/(app)/+layout.server.ts` | `depends('app:rooms')` |
-| `src/routes/(app)/chat/[roomId]/+page.svelte` | invalidate + 키보드 단축키 + 스크롤 제어 + 제목 편집 |
+| `src/routes/(app)/chat/[roomId]/+page.svelte` | invalidate + 키보드 단축키 + 스크롤 제어 |
 | `src/lib/components/message-input.svelte` | ref export + onSend 콜백 |
 | `src/lib/chat/auto-scroll.ts` | scrollToBottom 외부 호출 |
 | `src/lib/server/rooms/leave-room.ts` | **새 파일**: leaveRoom() 함수 |
 | `src/lib/server/rooms/delete-room.ts` | **새 파일**: deleteRoom() 함수 |
-| `src/routes/api/rooms/[roomId]/+server.ts` | **새 파일**: DELETE + PATCH 엔드포인트 |
-| `src/lib/server/db/chat.schema.ts` | `roomUser.customName` 컬럼 추가 |
-| `src/lib/server/rooms/queries.ts` | COALESCE(customName, name) 반영 |
-| `src/lib/components/room-item.svelte` | 나가기/삭제 버튼 + 제목 편집 UI |
+| `src/routes/api/rooms/[roomId]/+server.ts` | **새 파일**: DELETE 엔드포인트 |
+| `src/lib/components/room-item.svelte` | 나가기/삭제 버튼 UI |
 | `src/lib/server/socket/index.ts` | `room:deleted` 이벤트 추가 |
 
 ## 검증
 
 1. `pnpm test` — 기존 테스트 전체 통과
 2. `pnpm validate` — TypeScript + ESLint 클린
-3. DB 마이그레이션 — `custom_name` 컬럼 추가 확인
-4. 수동 확인:
+3. 수동 확인:
    - 로그인: 비밀번호 Enter → 로그인 완료
    - 안읽음 뱃지: 채팅방 진입 → 0으로 리셋
    - Escape: 스크롤 중 → 입력칸 포커스 + 하단 이동
    - 전송: 스크롤 올린 상태 전송 → 하단 자동 이동
    - 나가기: room-item 나가기 → 목록에서 제거 확인
    - 삭제: 확인 다이얼로그 → 양쪽 모두 삭제 + 상대방 실시간 반영
-   - 제목 변경: 인라인 편집 → 목록/헤더 즉시 반영, 상대방에겐 영향 없음
+   - Empty State: 빈 목록/빈 채팅방 안내 문구 표시
