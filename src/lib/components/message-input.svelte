@@ -10,7 +10,9 @@
 		currentMatchIndex = 0,
 		onSearch,
 		onSearchClose,
-		onSearchNavigate
+		onSearchNavigate,
+		onSendSuccess,
+		inputRef = $bindable(null)
 	}: {
 		disabled?: boolean;
 		matchCount?: number;
@@ -18,6 +20,8 @@
 		onSearch?: (query: string) => void;
 		onSearchClose?: () => void;
 		onSearchNavigate?: (direction: 'prev' | 'next') => void;
+		onSendSuccess?: () => void;
+		inputRef?: HTMLInputElement | null;
 	} = $props();
 
 	let content = $state('');
@@ -39,6 +43,7 @@
 			await update();
 			if (result.type === 'success') {
 				content = '';
+				onSendSuccess?.();
 			}
 			submitting = false;
 		};
@@ -65,6 +70,7 @@
 				onSearchNavigate?.('next');
 			}
 		} else if (e.key === 'Escape') {
+			e.stopPropagation();
 			toggleSearchMode();
 		}
 	}
@@ -126,6 +132,7 @@
 				name="content"
 				placeholder="메시지를 입력하세요"
 				bind:value={content}
+				bind:ref={inputRef}
 				disabled={disabled || submitting}
 				autocomplete="off"
 			/>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
+	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { Button } from '$ui/button';
 	import * as Card from '$ui/card';
@@ -9,9 +10,9 @@
 	let { form }: PageProps = $props();
 
 	let clientErrors: SignUpFormErrors = $state({ email: null, password: null, name: null });
+	let submitting = $state(false);
 
-	function handleSubmit(event: SubmitEvent) {
-		const formData = new FormData(event.target as HTMLFormElement);
+	function handleEnhance({ formData, cancel }: { formData: FormData; cancel: () => void }) {
 		const email = String(formData.get('email') ?? '');
 		const password = String(formData.get('password') ?? '');
 		const name = String(formData.get('name') ?? '');
@@ -19,8 +20,15 @@
 		clientErrors = validateSignUpForm({ email, password, name });
 
 		if (clientErrors.email || clientErrors.password || clientErrors.name) {
-			event.preventDefault();
+			cancel();
+			return;
 		}
+
+		submitting = true;
+		return async ({ update }: { update: () => Promise<void> }) => {
+			await update();
+			submitting = false;
+		};
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -49,7 +57,7 @@
 		<form
 			method="POST"
 			novalidate
-			onsubmit={handleSubmit}
+			use:enhance={handleEnhance}
 			onkeydown={handleKeydown}
 			class="space-y-2"
 		>
@@ -69,7 +77,13 @@
 				type="password"
 				error={passwordError}
 			/>
-			<Button type="submit" class="w-full">회원가입</Button>
+			<Button type="submit" disabled={submitting} class="w-full">
+				{#if submitting}
+					회원가입 중...
+				{:else}
+					회원가입
+				{/if}
+			</Button>
 		</form>
 	</Card.Content>
 	<Card.Footer class="justify-center">

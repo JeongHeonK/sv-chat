@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
+	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { Button } from '$ui/button';
 	import * as Card from '$ui/card';
@@ -9,17 +10,24 @@
 	let { form }: PageProps = $props();
 
 	let clientErrors: LoginFormErrors = $state({ email: null, password: null });
+	let submitting = $state(false);
 
-	function handleSubmit(event: SubmitEvent) {
-		const formData = new FormData(event.target as HTMLFormElement);
+	function handleEnhance({ formData, cancel }: { formData: FormData; cancel: () => void }) {
 		const email = String(formData.get('email') ?? '');
 		const password = String(formData.get('password') ?? '');
 
 		clientErrors = validateLoginForm({ email, password });
 
 		if (clientErrors.email || clientErrors.password) {
-			event.preventDefault();
+			cancel();
+			return;
 		}
+
+		submitting = true;
+		return async ({ update }: { update: () => Promise<void> }) => {
+			await update();
+			submitting = false;
+		};
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -47,7 +55,7 @@
 		<form
 			method="POST"
 			novalidate
-			onsubmit={handleSubmit}
+			use:enhance={handleEnhance}
 			onkeydown={handleKeydown}
 			class="space-y-2"
 		>
@@ -66,7 +74,13 @@
 				type="password"
 				error={passwordError}
 			/>
-			<Button type="submit" class="w-full">로그인</Button>
+			<Button type="submit" disabled={submitting} class="w-full">
+				{#if submitting}
+					로그인 중...
+				{:else}
+					로그인
+				{/if}
+			</Button>
 		</form>
 	</Card.Content>
 	<Card.Footer class="justify-center">
