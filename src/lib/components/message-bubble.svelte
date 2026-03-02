@@ -1,8 +1,11 @@
 <script lang="ts">
 	import type { ChatMessage } from '$lib/types/chat';
 	import { formatMessageTime } from '$lib/utils/time-format';
+	import { parseUrls } from '$lib/utils/url-parser';
 
 	let { message, isMine }: { message: ChatMessage; isMine: boolean } = $props();
+
+	const segments = $derived(parseUrls(message.content));
 </script>
 
 <div
@@ -22,7 +25,13 @@
 		class:text-primary-foreground={isMine}
 		class:bg-muted={!isMine}
 	>
-		{message.content}
+		<!-- eslint-disable svelte/no-navigation-without-resolve -->
+		{#each segments as seg, i (i)}{#if seg.type === 'url'}<a
+					href={seg.value.startsWith('http') ? seg.value : `https://${seg.value}`}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="break-all underline">{seg.value}</a
+				>{:else}{seg.value}{/if}{/each}
 	</div>
 	<time class="text-xs text-muted-foreground" datetime={message.createdAt}>
 		{formatMessageTime(message.createdAt)}

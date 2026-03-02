@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { RoomSummary } from '$lib/types/room';
 	import { formatRelativeTime } from '$lib/utils/time-format';
+	import UnreadBadge from './unread-badge.svelte';
 
 	let { room }: { room: RoomSummary } = $props();
 </script>
@@ -25,8 +26,13 @@
 				>
 			{/if}
 		</div>
-		{#if room.lastMessage}
-			<p class="truncate text-xs text-muted-foreground">{room.lastMessage}</p>
-		{/if}
+		<div class="flex items-center gap-1">
+			{#if room.lastMessage}
+				<p class="flex-1 truncate text-xs text-muted-foreground">{room.lastMessage}</p>
+			{:else}
+				<p class="flex-1"></p>
+			{/if}
+			<UnreadBadge count={room.unreadCount} />
+		</div>
 	</div>
 </a>

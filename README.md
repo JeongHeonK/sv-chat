@@ -91,6 +91,25 @@ SvelteKit의 Vite 개발 서버와 adapter-node 프로덕션 환경 모두에서
 
 better-auth 세션 기반 인증과 Socket.io handshake를 연결하여 인증된 사용자만 실시간 채팅에 참여할 수 있는 구조를 구현했습니다. 쿠키 헤더를 `auth.api.getSession()`에 직접 전달하는 방식으로 HTTP 세션과 WebSocket 인증 컨텍스트를 브릿지했습니다.
 
+### 디자인 패턴 적용
+
+코드베이스 분석 후 4가지 패턴을 검토하고, **실제 문제를 해결하는 2가지만 선택적으로 적용**했습니다.
+
+- **적용**: 퍼사드(서버 로직 캡슐화), 팩토리(메시지 모델 변환) — 결합도 감소와 변환 로직 일원화에 실질적 효과
+- **의도적 미적용**: 전략 패턴(메시지 타입 1종이라 불필요), 옵저버/Pub-Sub(Svelte 5 Runes가 이미 커버)
+
+> 패턴 적용/미적용 판단 근거는 [Tech Decision §10](./docs/tech_decision/tech_decision.md#10-디자인-패턴-선택적-적용) 참고
+
+### UI/UX 개선
+
+실제 사용 테스트 기반으로 버그 수정과 UX 기능을 추가했습니다.
+
+- **버그 수정**: Enter 키 submit 미작동, 안읽음 뱃지 미리셋
+- **UX 개선**: Escape 키 스크롤 단축키, 전송 후 자동 스크롤
+- **신규 기능**: 채팅방 나가기/삭제, 채팅방 제목 변경
+
+> 상세 내역은 [Tech Decision §11](./docs/tech_decision/tech_decision.md#11-uiux-개선) 참고
+
 ### Agent Context 최적화
 
 [Vercel 블로그 분석](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals) 결과를 기반으로 AI 에이전트 컨텍스트를 최적화했습니다.
