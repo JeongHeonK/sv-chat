@@ -2,10 +2,7 @@ import { and, desc, eq, ilike, sql } from 'drizzle-orm';
 import { message, roomUser } from '$lib/server/db/chat.schema';
 import { user } from '$lib/server/db/auth.schema';
 import type { Database } from '$lib/server/db';
-
-function escapeLikePattern(s: string): string {
-	return s.replace(/[%_\\]/g, '\\$&');
-}
+import { escapeLikePattern } from '$lib/server/db/utils';
 
 export interface SearchResult {
 	id: string;

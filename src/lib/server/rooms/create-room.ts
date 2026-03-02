@@ -1,11 +1,8 @@
-import { eq, or, ilike, and, sql } from 'drizzle-orm';
+import { eq, or, ilike, and, ne } from 'drizzle-orm';
 import { room, roomUser, type Room } from '$lib/server/db/chat.schema';
 import { user } from '$lib/server/db/auth.schema';
 import type { Database } from '$lib/server/db';
-
-function escapeLikePattern(s: string): string {
-	return s.replace(/[%_\\]/g, '\\$&');
-}
+import { escapeLikePattern } from '$lib/server/db/utils';
 
 export interface SearchUserResult {
 	id: string;
@@ -33,10 +30,7 @@ export async function searchUsers(
 		})
 		.from(user)
 		.where(
-			and(
-				sql`${user.id} != ${excludeUserId}`,
-				or(ilike(user.name, pattern), ilike(user.email, pattern))
-			)
+			and(ne(user.id, excludeUserId), or(ilike(user.name, pattern), ilike(user.email, pattern)))
 		)
 		.limit(20);
 }
@@ -96,7 +90,11 @@ export async function createOneToOneRoom(
 		// unique constraint violation → 기존 방 반환 (race condition 처리)
 		if (isUniqueViolation(err)) {
 			const fallback = await db.select().from(room).where(eq(room.participantHash, hash)).limit(1);
-			if (fallback[0]) return fallback[0];
+			if (fallback[0]) {
+				return fallback[0];
+			}
+			// This case is unexpected. The DB reported a unique violation, but we can't find the conflicting row.
+			throw new Error(`Failed to resolve room creation conflict for hash: ${hash}.`);
 		}
 		throw err;
 	}
