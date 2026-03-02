@@ -2,8 +2,7 @@ import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { assertRoomMember, getMessages } from '$lib/server/rooms';
-import { saveMessage, broadcastMessage } from '$lib/server/rooms/send-message';
-import { getIO } from '$lib/server/socket/io';
+import { chatService } from '$lib/server/chat-service-instance';
 
 export const load: PageServerLoad = async (event) => {
 	const userId = event.locals.user?.id;
@@ -31,10 +30,7 @@ export const actions: Actions = {
 		if (!content) return fail(400, { error: 'Message cannot be empty' });
 		if (content.length > 5000) return fail(400, { error: 'Message too long' });
 
-		await assertRoomMember(db, userId, roomId);
-
-		const saved = await saveMessage(db, { roomId, senderId: userId, content });
-		broadcastMessage(getIO(), roomId, saved);
+		await chatService.sendMessage({ userId, roomId, content });
 
 		return { success: true };
 	}

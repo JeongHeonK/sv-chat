@@ -1,6 +1,5 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { createOneToOneRoom } from '$lib/server/rooms/create-room';
+import { chatService } from '$lib/server/chat-service-instance';
 
 /**
  * POST /api/rooms — 1:1 방 생성
@@ -52,7 +51,7 @@ export const POST: RequestHandler = async (event) => {
 	}
 
 	try {
-		const room = await createOneToOneRoom(db, userId, otherUserId);
+		const room = await chatService.createRoom(userId, otherUserId);
 		return json({ roomId: room.id }, { status: 200 });
 	} catch (err: unknown) {
 		console.error('Failed to create room:', err);

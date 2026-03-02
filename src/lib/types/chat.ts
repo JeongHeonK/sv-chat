@@ -34,3 +34,8 @@ export function toMessage(raw: RawSocketMessage): ChatMessage {
 		createdAt: raw.createdAt instanceof Date ? raw.createdAt.toISOString() : raw.createdAt
 	};
 }
+
+export const MessageFactory = {
+	validate: isValidSocketMessage,
+	fromSocket: toMessage
+} as const;
