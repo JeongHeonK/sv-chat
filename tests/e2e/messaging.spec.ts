@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createAuthenticatedContext } from './fixtures/auth';
+import { createAuthenticatedContext } from './fixtures/index';
 import { createRoomWith, sendMessage, waitForMessage } from './fixtures/chat';
 
 test.describe('실시간 메시지', () => {
@@ -21,7 +21,7 @@ test.describe('실시간 메시지', () => {
 		const message = `안녕하세요 ${Date.now()}`;
 		await sendMessage(pageA, message);
 
-		// B가 실시간으로 수신 (타임아웃 늘림)
+		// B가 실시간으로 수신
 		await waitForMessage(pageB, message, 8000);
 
 		await ctxA.close();
@@ -83,17 +83,13 @@ test.describe('실시간 메시지', () => {
 		});
 
 		if (!scrolled) {
-			// 스크롤 가능한 컨테이너가 없으면 skip
 			test.skip();
 			await ctxA.close();
 			await ctxB.close();
 			return;
 		}
 
-		// scroll 이벤트 처리 대기
 		await pageA.waitForTimeout(300);
-
-		// 스크롤 버튼이 나타나야 함
 		const scrollBtn = pageA.getByRole('button', { name: '최하단으로 스크롤' });
 		await expect(scrollBtn).toBeVisible({ timeout: 3000 });
 
