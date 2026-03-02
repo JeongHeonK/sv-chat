@@ -24,18 +24,27 @@ export const POST: RequestHandler = async (event) => {
 	}
 
 	const userId = event.locals.user.id;
-	let otherUserId: string;
-
+	let payload: unknown;
 	try {
-		const body = await event.request.json();
-		otherUserId = body.otherUserId;
-
-		if (!otherUserId || typeof otherUserId !== 'string') {
-			return json({ error: 'otherUserId is required and must be a string' }, { status: 400 });
-		}
+		payload = await event.request.json();
 	} catch {
-		return json({ error: 'Invalid JSON' }, { status: 400 });
+		return json({ error: 'Invalid JSON format' }, { status: 400 });
 	}
+
+	if (
+		typeof payload !== 'object' ||
+		payload === null ||
+		!('otherUserId' in payload) ||
+		typeof payload.otherUserId !== 'string' ||
+		!payload.otherUserId
+	) {
+		return json(
+			{ error: 'otherUserId is required and must be a non-empty string' },
+			{ status: 400 }
+		);
+	}
+
+	const otherUserId = payload.otherUserId;
 
 	// 자신과의 방 생성 방지
 	if (userId === otherUserId) {
