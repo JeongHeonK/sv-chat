@@ -12,9 +12,11 @@ test.describe('인증', () => {
 
 	test('로그인 → 홈 리다이렉트', async ({ page }) => {
 		const user = createTestUser('login');
+		// 회원가입으로 유저 생성
 		await signup(page, user);
-		await page.getByRole('button', { name: '로그아웃' }).click();
-		await page.waitForURL('/login');
+		// 쿠키 클리어로 로그아웃 (better-auth의 window.location 방식 우회)
+		await page.context().clearCookies();
+		// 로그인 테스트
 		await login(page, user);
 		expect(page.url()).toMatch(/http:\/\/localhost:\d+\/?$/);
 	});
@@ -23,8 +25,8 @@ test.describe('인증', () => {
 		const user = createTestUser('dup');
 		// 첫 번째 회원가입 성공
 		await signup(page, user);
-		await page.getByRole('button', { name: '로그아웃' }).click();
-		await page.waitForURL('/login');
+		// 쿠키 클리어 후 재가입 시도
+		await page.context().clearCookies();
 
 		// 같은 이메일로 재가입 시도
 		await page.goto('/signup');

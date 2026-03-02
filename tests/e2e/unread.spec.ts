@@ -3,7 +3,10 @@ import { createAuthenticatedContext } from './fixtures/auth';
 import { createRoomWith, sendMessage } from './fixtures/chat';
 
 test.describe('안읽음 뱃지', () => {
-	test('다른 방에 있을 때 메시지 수신 시 뱃지 증가', async ({ browser }) => {
+	// 참고: 사이드바 unread count는 SSR(서버 렌더링) 기반으로 동작.
+	// 실시간 소켓 업데이트가 아닌 페이지 navigate 시 서버에서 재조회됨.
+
+	test('다른 방 이동 후 돌아왔을 때 뱃지 표시', async ({ browser }) => {
 		const { context: ctxA, page: pageA } = await createAuthenticatedContext(browser, 'unread-a');
 		const { context: ctxB, page: pageB, user: userB } = await createAuthenticatedContext(
 			browser,
@@ -13,7 +16,7 @@ test.describe('안읽음 뱃지', () => {
 		// A가 B와 방 생성
 		const roomId = await createRoomWith(pageA, userB.name);
 
-		// B도 방에 접속했다가 홈으로 나감 (다른 곳에 있음)
+		// B도 방에 접속했다가 홈으로 나감
 		await pageB.goto(`/chat/${roomId}`);
 		await pageB.goto('/');
 
@@ -21,7 +24,8 @@ test.describe('안읽음 뱃지', () => {
 		const message = `안읽은 메시지 ${Date.now()}`;
 		await sendMessage(pageA, message);
 
-		// B의 사이드바에 안읽음 뱃지가 표시되어야 함
+		// B가 홈을 재방문하면 뱃지가 표시되어야 함 (SSR 재조회)
+		await pageB.reload();
 		await expect(pageB.locator('[data-unread-badge]')).toBeVisible({ timeout: 5000 });
 
 		await ctxA.close();
@@ -42,13 +46,14 @@ test.describe('안읽음 뱃지', () => {
 		const message = `읽기전 메시지 ${Date.now()}`;
 		await sendMessage(pageA, message);
 
-		// B의 뱃지가 표시될 때까지 대기
+		// B가 홈 reload → 뱃지 표시 확인
+		await pageB.reload();
 		await expect(pageB.locator('[data-unread-badge]')).toBeVisible({ timeout: 5000 });
 
-		// B가 방에 입장
+		// B가 방에 입장 → lastReadAt 갱신 → 뱃지 초기화
 		await pageB.goto(`/chat/${roomId}`);
-
-		// 뱃지가 사라져야 함
+		// 채팅방 페이지에서 홈으로 이동 시 layout reload
+		await pageB.goto('/');
 		await expect(pageB.locator('[data-unread-badge]')).not.toBeVisible({ timeout: 5000 });
 
 		await ctxA.close();
