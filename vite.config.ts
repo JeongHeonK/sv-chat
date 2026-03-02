@@ -14,7 +14,14 @@ export default defineConfig({
 			{
 				extends: './vite.config.ts',
 				optimizeDeps: {
-					include: ['bits-ui', 'tailwind-variants', 'tailwind-merge', 'clsx', 'better-auth/svelte']
+					include: [
+						'bits-ui',
+						'tailwind-variants',
+						'tailwind-merge',
+						'clsx',
+						'better-auth/svelte',
+						'@lucide/svelte'
+					]
 				},
 				test: {
 					name: 'client',
