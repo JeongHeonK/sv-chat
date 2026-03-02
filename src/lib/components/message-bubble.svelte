@@ -3,14 +3,21 @@
 	import { formatMessageTime } from '$lib/utils/time-format';
 	import { parseUrls } from '$lib/utils/url-parser';
 
-	let { message, isMine }: { message: ChatMessage; isMine: boolean } = $props();
+	let {
+		message,
+		isMine,
+		highlighted = false
+	}: { message: ChatMessage; isMine: boolean; highlighted?: boolean } = $props();
 
 	const segments = $derived(parseUrls(message.content));
 </script>
 
 <div
-	class="flex flex-col gap-1"
+	class="flex flex-col gap-1 rounded-md transition-all duration-300 {highlighted
+		? 'bg-accent p-1'
+		: ''}"
 	data-mine={isMine}
+	data-message-id={message.id}
 	class:items-end={isMine}
 	class:items-start={!isMine}
 >

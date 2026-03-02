@@ -1,9 +1,9 @@
 import { render } from 'vitest-browser-svelte';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import MessageSearch from '$lib/components/message-search.svelte';
-import type { SearchMessagesResult } from '$lib/types/search';
+import type { SearchMessageItem } from '$lib/types/search';
 
-const mockMessages: SearchMessagesResult[] = [
+const mockMessages: SearchMessageItem[] = [
 	{
 		id: 'msg-1',
 		roomId: 'room-1',
@@ -27,7 +27,8 @@ vi.mock('$app/navigation', () => ({
 	goto: (...args: unknown[]) => mockGoto(...args)
 }));
 
-function createMockFetch(response: unknown, status = 200) {
+function createMockFetch(messages: SearchMessageItem[], total?: number, status = 200) {
+	const response = { messages, total: total ?? messages.length };
 	return vi.fn().mockResolvedValue({
 		ok: status >= 200 && status < 300,
 		status,
@@ -49,6 +50,11 @@ describe('MessageSearch — 렌더링', () => {
 	it('초기 상태에서 결과 목록은 숨겨져 있다', async () => {
 		const screen = render(MessageSearch);
 		expect(screen.container.querySelector('[role="listbox"]')).toBeNull();
+	});
+
+	it('초기 상태에서 안내 텍스트를 표시한다', async () => {
+		const screen = render(MessageSearch);
+		await expect.element(screen.getByText('검색어를 입력하세요')).toBeVisible();
 	});
 });
 
@@ -144,8 +150,8 @@ describe('MessageSearch — 더보기 페이지네이션', () => {
 		vi.useFakeTimers();
 	});
 
-	it('결과가 20개이면 더보기 버튼을 표시한다', async () => {
-		const twentyMessages = Array.from({ length: 20 }, (_, i) => ({
+	it('결과가 20개이고 total이 더 크면 더보기 버튼을 표시한다', async () => {
+		const twentyMessages: SearchMessageItem[] = Array.from({ length: 20 }, (_, i) => ({
 			id: `msg-${i}`,
 			roomId: `room-${i}`,
 			content: `메시지 ${i}`,
@@ -154,7 +160,7 @@ describe('MessageSearch — 더보기 페이지네이션', () => {
 			createdAt: '2024-03-15T10:30:00Z'
 		}));
 
-		vi.stubGlobal('fetch', createMockFetch(twentyMessages));
+		vi.stubGlobal('fetch', createMockFetch(twentyMessages, 25));
 
 		const screen = render(MessageSearch);
 		const input = screen.getByPlaceholder('메시지 검색...');
@@ -165,8 +171,8 @@ describe('MessageSearch — 더보기 페이지네이션', () => {
 		await expect.element(screen.getByText('더보기')).toBeVisible();
 	});
 
-	it('결과가 20개 미만이면 더보기 버튼을 숨긴다', async () => {
-		vi.stubGlobal('fetch', createMockFetch(mockMessages));
+	it('결과가 total과 같으면 더보기 버튼을 숨긴다', async () => {
+		vi.stubGlobal('fetch', createMockFetch(mockMessages, 2));
 
 		const screen = render(MessageSearch);
 		const input = screen.getByPlaceholder('메시지 검색...');
@@ -178,7 +184,7 @@ describe('MessageSearch — 더보기 페이지네이션', () => {
 	});
 
 	it('더보기 클릭 시 offset을 증가시켜 API를 호출한다', async () => {
-		const twentyMessages = Array.from({ length: 20 }, (_, i) => ({
+		const twentyMessages: SearchMessageItem[] = Array.from({ length: 20 }, (_, i) => ({
 			id: `msg-${i}`,
 			roomId: `room-${i}`,
 			content: `메시지 ${i}`,
@@ -187,7 +193,7 @@ describe('MessageSearch — 더보기 페이지네이션', () => {
 			createdAt: '2024-03-15T10:30:00Z'
 		}));
 
-		const mockFetch = createMockFetch(twentyMessages);
+		const mockFetch = createMockFetch(twentyMessages, 25);
 		vi.stubGlobal('fetch', mockFetch);
 
 		const screen = render(MessageSearch);
@@ -197,7 +203,7 @@ describe('MessageSearch — 더보기 페이지네이션', () => {
 		await vi.advanceTimersByTimeAsync(300);
 
 		// 두 번째 페이지 응답
-		const secondPageFetch = createMockFetch([
+		const secondPageMessages: SearchMessageItem[] = [
 			{
 				id: 'msg-20',
 				roomId: 'room-20',
@@ -206,7 +212,8 @@ describe('MessageSearch — 더보기 페이지네이션', () => {
 				senderId: 'user-20',
 				createdAt: '2024-03-15T10:30:00Z'
 			}
-		]);
+		];
+		const secondPageFetch = createMockFetch(secondPageMessages, 25);
 		vi.stubGlobal('fetch', secondPageFetch);
 
 		await screen.getByText('더보기').click();

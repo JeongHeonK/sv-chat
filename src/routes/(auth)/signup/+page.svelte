@@ -23,6 +23,17 @@
 		}
 	}
 
+	function handleKeydown(event: KeyboardEvent) {
+		// IME 조합 중이면 무시 (한국어, 중국어 등)
+		if (event.isComposing) return;
+
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			const form = (event.target as HTMLElement).closest('form') as HTMLFormElement;
+			form?.requestSubmit();
+		}
+	}
+
 	let nameError = $derived(form?.errors?.name ?? clientErrors.name);
 	let emailError = $derived(form?.errors?.email ?? clientErrors.email);
 	let passwordError = $derived(form?.errors?.password ?? clientErrors.password);
@@ -34,7 +45,14 @@
 		<Card.Description>새 계정을 만드세요.</Card.Description>
 	</Card.Header>
 	<Card.Content>
-		<form method="POST" novalidate onsubmit={handleSubmit} class="space-y-2">
+		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+		<form
+			method="POST"
+			novalidate
+			onsubmit={handleSubmit}
+			onkeydown={handleKeydown}
+			class="space-y-2"
+		>
 			<FormField id="name" label="이름" name="name" value={form?.name ?? ''} error={nameError} />
 			<FormField
 				id="email"
