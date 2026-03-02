@@ -1,10 +1,15 @@
 import type { Page } from '@playwright/test';
 
 export async function createRoomWith(page: Page, otherUserName: string) {
+	await page.waitForLoadState('networkidle');
 	await page.getByRole('button', { name: '새 채팅 시작' }).click();
 	const searchInput = page.getByPlaceholder('사용자 검색...');
+	await searchInput.waitFor({ timeout: 5000 });
+	const searchPromise = page.waitForResponse(
+		(res) => res.url().includes('/api/users/search') && res.ok()
+	);
 	await searchInput.fill(otherUserName);
-	await page.waitForResponse((res) => res.url().includes('/api/users/search') && res.ok());
+	await searchPromise;
 	await page.getByRole('option').filter({ hasText: otherUserName }).click();
 	await page.waitForURL(/\/chat\/.+/);
 	const url = page.url();

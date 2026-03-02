@@ -5,10 +5,11 @@ import { createRoomWith, sendMessage, waitForMessage } from './fixtures/chat';
 test.describe('실시간 메시지', () => {
 	test('User A 메시지 전송 → User B 실시간 수신', async ({ browser }) => {
 		const { context: ctxA, page: pageA } = await createAuthenticatedContext(browser, 'msg-a');
-		const { context: ctxB, page: pageB, user: userB } = await createAuthenticatedContext(
-			browser,
-			'msg-b'
-		);
+		const {
+			context: ctxB,
+			page: pageB,
+			user: userB
+		} = await createAuthenticatedContext(browser, 'msg-b');
 
 		// A가 B와 방 생성
 		const roomId = await createRoomWith(pageA, userB.name);
@@ -49,10 +50,7 @@ test.describe('실시간 메시지', () => {
 
 	test('상단에 있을 때 스크롤 버튼 표시', async ({ browser }) => {
 		const { context: ctxA, page: pageA } = await createAuthenticatedContext(browser, 'scrollbtn-a');
-		const { context: ctxB, user: userB } = await createAuthenticatedContext(
-			browser,
-			'scrollbtn-b'
-		);
+		const { context: ctxB, user: userB } = await createAuthenticatedContext(browser, 'scrollbtn-b');
 
 		await createRoomWith(pageA, userB.name);
 

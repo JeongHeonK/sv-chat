@@ -42,10 +42,13 @@ test.describe('검색', () => {
 		// 홈으로 이동
 		await pageA.goto('/');
 
-		// 사이드바 검색 입력
+		// 사이드바 검색 입력 (waitForResponse를 fill 전에 등록)
 		const sidebarSearch = pageA.getByPlaceholder('메시지 검색...');
+		const searchPromise = pageA.waitForResponse(
+			(res) => res.url().includes('/api/messages/search') && res.ok()
+		);
 		await sidebarSearch.fill(keyword);
-		await pageA.waitForResponse((res) => res.url().includes('/api/messages/search') && res.ok());
+		await searchPromise;
 
 		// 결과가 표시되고 클릭
 		const result = pageA.getByRole('option').filter({ hasText: keyword });

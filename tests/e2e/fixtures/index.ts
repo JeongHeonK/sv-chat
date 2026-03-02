@@ -33,14 +33,12 @@ interface TwoUserFixtures {
  * messaging, unread 테스트에서 공통으로 사용.
  */
 export const twoUserTest = base.extend<TwoUserFixtures>({
-	// eslint-disable-next-line no-empty-pattern
 	userA: async ({ browser }, use, testInfo) => {
 		const prefix = `a-${testInfo.testId.slice(-6)}`;
 		const ctx = await createUserContext(browser, prefix);
 		await use(ctx);
 		await ctx.context.close();
 	},
-	// eslint-disable-next-line no-empty-pattern
 	userB: async ({ browser }, use, testInfo) => {
 		const prefix = `b-${testInfo.testId.slice(-6)}`;
 		const ctx = await createUserContext(browser, prefix);
