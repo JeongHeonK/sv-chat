@@ -1,4 +1,4 @@
-import { and, eq, count } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { room, roomUser } from '$lib/server/db/chat.schema';
 import type { Database } from '$lib/server/db';
 import { getIO } from '$lib/server/socket/io';
@@ -16,7 +16,7 @@ export async function leaveRoom(db: Database, userId: string, roomId: string): P
 
 		// 2. 남은 멤버 수 확인
 		const remaining = await tx
-			.select({ count: count() })
+			.select({ count: sql<number>`cast(count(${roomUser.id}) as integer)` })
 			.from(roomUser)
 			.where(eq(roomUser.roomId, roomId));
 
