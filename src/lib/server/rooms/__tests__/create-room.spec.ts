@@ -1,5 +1,5 @@
 import { describe, it, expect, afterAll } from 'vitest';
-import { like, eq } from 'drizzle-orm';
+import { like, eq, and } from 'drizzle-orm';
 import { testDb, closeConnection } from '../../db/__tests__/setup';
 import { user } from '../../db/auth.schema';
 import { room, roomUser } from '../../db/chat.schema';
@@ -103,5 +103,39 @@ describe('createOneToOneRoom', () => {
 
 		const expectedHash = [userA.id, userB.id].sort().join(':');
 		expect(rooms[0]?.participantHash).toBe(expectedHash);
+	});
+
+	it('자기 자신과 방 생성 시 에러를 던진다', async () => {
+		const userA = createTestUser('self');
+		await testDb.insert(user).values(userA);
+
+		await expect(createOneToOneRoom(testDb, userA.id, userA.id)).rejects.toThrow(
+			'Cannot create room with self'
+		);
+	});
+
+	it('나갔던 유저가 다시 대화 시작 시 멤버십이 복구된다', async () => {
+		const userA = createTestUser('rejoin-a');
+		const userB = createTestUser('rejoin-b');
+		await testDb.insert(user).values([userA, userB]);
+
+		// 방 생성
+		const created = await createOneToOneRoom(testDb, userA.id, userB.id);
+
+		// userA의 roomUser 삭제 (방 나감 시뮬레이션)
+		await testDb
+			.delete(roomUser)
+			.where(and(eq(roomUser.roomId, created.id), eq(roomUser.userId, userA.id)));
+
+		// userA가 다시 대화 시작
+		const rejoined = await createOneToOneRoom(testDb, userA.id, userB.id);
+
+		expect(rejoined.id).toBe(created.id);
+
+		// roomUser가 다시 2명인지 확인
+		const members = await testDb.select().from(roomUser).where(eq(roomUser.roomId, created.id));
+		expect(members).toHaveLength(2);
+		const memberIds = members.map((m) => m.userId).sort();
+		expect(memberIds).toEqual([userA.id, userB.id].sort());
 	});
 });
