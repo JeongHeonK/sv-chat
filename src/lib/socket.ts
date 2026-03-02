@@ -6,7 +6,7 @@ interface SocketCallbacks {
 	onMessage: (msg: ChatMessage) => void;
 	onSync: (messages: ChatMessage[]) => void;
 	onRoomDeleted?: (data: { roomId: string }) => void;
-	onRoomLeft?: (data: { roomId: string }) => void;
+	onRoomLeft?: (data: { roomId: string; userId: string }) => void;
 	getLastTimestamp: () => string | null;
 }
 
@@ -16,6 +16,14 @@ function isRoomEvent(data: unknown): data is { roomId: string } {
 		data !== null &&
 		'roomId' in data &&
 		typeof (data as Record<string, unknown>).roomId === 'string'
+	);
+}
+
+function isRoomLeftEvent(data: unknown): data is { roomId: string; userId: string } {
+	return (
+		isRoomEvent(data) &&
+		'userId' in data &&
+		typeof (data as Record<string, unknown>).userId === 'string'
 	);
 }
 
@@ -41,7 +49,7 @@ export function createSocketConnection(
 	});
 
 	socket.on(SOCKET_EVENTS.ROOM_LEFT, (data: unknown) => {
-		if (isRoomEvent(data)) {
+		if (isRoomLeftEvent(data)) {
 			callbacks.onRoomLeft?.(data);
 		}
 	});

@@ -47,10 +47,31 @@ export async function createOneToOneRoom(
 	if (userIdA === userIdB) throw new Error('Cannot create room with self');
 	const hash = computeParticipantHash(userIdA, userIdB);
 
-	// 기존 방이 있으면 바로 반환
+	// 기존 방이 있으면 멤버십 복구 후 반환
 	const existing = await db.select().from(room).where(eq(room.participantHash, hash)).limit(1);
 
-	if (existing[0]) return existing[0];
+	if (existing[0]) {
+		// 나갔던 유저가 다시 대화 시작 시 roomUser 복구 (트랜잭션으로 중복 삽입 방지)
+		const existingRoom = existing[0];
+		await db.transaction(async (tx) => {
+			for (const uid of [userIdA, userIdB]) {
+				const membership = await tx
+					.select()
+					.from(roomUser)
+					.where(and(eq(roomUser.roomId, existingRoom.id), eq(roomUser.userId, uid)))
+					.limit(1);
+				if (membership.length === 0) {
+					await tx.insert(roomUser).values({
+						id: crypto.randomUUID(),
+						roomId: existingRoom.id,
+						userId: uid,
+						joinedAt: new Date()
+					});
+				}
+			}
+		});
+		return existingRoom;
+	}
 
 	// 트랜잭션으로 room + roomUser 2개 생성
 	try {

@@ -26,7 +26,7 @@ export async function leaveRoom(db: Database, userId: string, roomId: string): P
 		} else {
 			// 3b. 남은 멤버에게 room:left 이벤트 전송
 			const io = getIO();
-			io.to(roomId).emit(SOCKET_EVENTS.ROOM_LEFT, { roomId });
+			io.to(roomId).emit(SOCKET_EVENTS.ROOM_LEFT, { roomId, userId });
 		}
 	});
 }
