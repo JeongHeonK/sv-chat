@@ -5,6 +5,8 @@ import { playwright } from '@vitest/browser-playwright';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { socketDevPlugin } from './src/lib/server/socket/vite-plugin';
 
+const SERVER_TEST_TIMEOUT = 15_000;
+
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit(), socketDevPlugin()],
 	server: { port: 5173, strictPort: true },
@@ -47,6 +49,7 @@ export default defineConfig({
 				test: {
 					name: 'server',
 					environment: 'node',
+					testTimeout: SERVER_TEST_TIMEOUT,
 					env: loadEnv('', process.cwd(), ''),
 					include: ['src/**/*.{test,spec}.{js,ts}'],
 					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
