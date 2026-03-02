@@ -1,6 +1,6 @@
 <script lang="ts">
-	/* eslint-disable svelte/no-navigation-without-resolve */
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { debounce } from '$lib/utils/debounce';
 	import type { SearchUserResult } from '$lib/types/user';
 
@@ -57,7 +57,7 @@
 			const data: { roomId: string } = await res.json();
 			query = '';
 			resetState();
-			await goto(`/chat/${data.roomId}`);
+			await goto(resolve(`/chat/${data.roomId}`));
 		}
 	}
 </script>

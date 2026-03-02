@@ -5,11 +5,26 @@ import { playwright } from '@vitest/browser-playwright';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { socketDevPlugin } from './src/lib/server/socket/vite-plugin';
 
+const SERVER_TEST_TIMEOUT = 15_000;
+
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit(), socketDevPlugin()],
 	server: { port: 5173, strictPort: true },
 	test: {
 		expect: { requireAssertions: true },
+		coverage: {
+			exclude: [
+				'src/lib/components/ui/**',
+				'src/lib/server/db/schema.ts',
+				'src/lib/server/socket/io.ts',
+				'src/lib/server/socket/vite-plugin.ts',
+				'src/lib/server/chat-service-instance.ts',
+				'src/lib/auth-client.ts',
+				'src/routes/**/+layout.*',
+				'src/routes/**/+page.server.ts',
+				'src/app.d.ts'
+			]
+		},
 		projects: [
 			{
 				extends: './vite.config.ts',
@@ -47,6 +62,7 @@ export default defineConfig({
 				test: {
 					name: 'server',
 					environment: 'node',
+					testTimeout: SERVER_TEST_TIMEOUT,
 					env: loadEnv('', process.cwd(), ''),
 					include: ['src/**/*.{test,spec}.{js,ts}'],
 					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']

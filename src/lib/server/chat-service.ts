@@ -5,10 +5,14 @@ import type { Database } from '$lib/server/db';
 import { assertRoomMember } from '$lib/server/rooms/guards';
 import { saveMessage, broadcastMessage } from '$lib/server/rooms/send-message';
 import { createOneToOneRoom } from '$lib/server/rooms/create-room';
+import { leaveRoom } from '$lib/server/rooms/leave-room';
+import { deleteRoom } from '$lib/server/rooms/delete-room';
 
 export interface ChatService {
 	sendMessage(params: { userId: string; roomId: string; content: string }): Promise<Message>;
 	createRoom(userIdA: string, userIdB: string): Promise<Room>;
+	leaveRoom(userId: string, roomId: string): Promise<void>;
+	deleteRoom(userId: string, roomId: string): Promise<void>;
 }
 
 export function createChatService(deps: {
@@ -27,6 +31,16 @@ export function createChatService(deps: {
 
 		async createRoom(userIdA, userIdB) {
 			return createOneToOneRoom(db, userIdA, userIdB);
+		},
+
+		async leaveRoom(userId, roomId) {
+			await assertRoomMember(db, userId, roomId);
+			return leaveRoom(db, userId, roomId);
+		},
+
+		async deleteRoom(userId, roomId) {
+			await assertRoomMember(db, userId, roomId);
+			return deleteRoom(db, roomId);
 		}
 	};
 }

@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { tick } from 'svelte';
 	import { Search, X, ChevronUp, ChevronDown } from '@lucide/svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 
 	let {
 		disabled = false,
+		roomId,
 		matchCount = 0,
 		currentMatchIndex = 0,
 		onSearch,
@@ -15,6 +16,7 @@
 		inputRef = $bindable(null)
 	}: {
 		disabled?: boolean;
+		roomId: string;
 		matchCount?: number;
 		currentMatchIndex?: number;
 		onSearch?: (query: string) => void;
@@ -31,22 +33,38 @@
 
 	const canSend = $derived(content.trim().length > 0 && !disabled && !submitting);
 
-	function handleEnhance() {
+	async function sendMessage() {
+		if (!canSend) return;
+
+		const message = content.trim();
+		content = '';
 		submitting = true;
-		return async ({
-			result,
-			update
-		}: {
-			result: import('@sveltejs/kit').ActionResult;
-			update: () => Promise<void>;
-		}) => {
-			await update();
-			if (result.type === 'success') {
-				content = '';
+
+		try {
+			const res = await fetch(`/api/rooms/${roomId}/messages`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ content: message })
+			});
+			if (res.ok) {
 				onSendSuccess?.();
+			} else {
+				content = message;
 			}
+		} catch {
+			content = message;
+		} finally {
 			submitting = false;
-		};
+			await tick();
+			inputRef?.focus();
+		}
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			sendMessage();
+		}
 	}
 
 	function toggleSearchMode() {
@@ -115,28 +133,26 @@
 		</Button>
 	</div>
 {:else}
-	<form method="POST" use:enhance={handleEnhance}>
-		<div class="flex items-center gap-2">
-			<Button
-				type="button"
-				variant="ghost"
-				size="icon"
-				onclick={toggleSearchMode}
-				aria-label="대화 검색"
-			>
-				<Search class="h-4 w-4" />
-			</Button>
-			<label for="message-input" class="sr-only">메시지 입력</label>
-			<Input
-				id="message-input"
-				name="content"
-				placeholder="메시지를 입력하세요"
-				bind:value={content}
-				bind:ref={inputRef}
-				disabled={disabled || submitting}
-				autocomplete="off"
-			/>
-			<Button type="submit" disabled={!canSend} aria-label="전송">전송</Button>
-		</div>
-	</form>
+	<div class="flex items-center gap-2">
+		<Button
+			type="button"
+			variant="ghost"
+			size="icon"
+			onclick={toggleSearchMode}
+			aria-label="대화 검색"
+		>
+			<Search class="h-4 w-4" />
+		</Button>
+		<label for="message-input" class="sr-only">메시지 입력</label>
+		<Input
+			id="message-input"
+			placeholder="메시지를 입력하세요"
+			bind:value={content}
+			bind:ref={inputRef}
+			disabled={disabled || submitting}
+			autocomplete="off"
+			onkeydown={handleKeydown}
+		/>
+		<Button type="button" disabled={!canSend} onclick={sendMessage} aria-label="전송">전송</Button>
+	</div>
 {/if}

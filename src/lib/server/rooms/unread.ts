@@ -1,4 +1,4 @@
-import { eq, gt, sql, and } from 'drizzle-orm';
+import { eq, gt, ne, sql, and } from 'drizzle-orm';
 import { roomUser, message } from '$lib/server/db/chat.schema';
 import type { Database } from '$lib/server/db';
 
@@ -16,7 +16,11 @@ export async function getUnreadCounts(db: Database, userId: string): Promise<Unr
 		.from(roomUser)
 		.leftJoin(
 			message,
-			and(eq(message.roomId, roomUser.roomId), gt(message.createdAt, roomUser.lastReadAt))
+			and(
+				eq(message.roomId, roomUser.roomId),
+				gt(message.createdAt, roomUser.lastReadAt),
+				ne(message.senderId, userId)
+			)
 		)
 		.where(eq(roomUser.userId, userId))
 		.groupBy(roomUser.roomId);

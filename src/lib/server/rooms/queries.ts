@@ -39,16 +39,17 @@ export async function getUserRooms(
 		.as('last_msg');
 
 	// 유저가 참여한 방 + 상대방 정보 + 최신 메시지 JOIN
+	// 상대방이 나간 경우에도 방이 표시되도록 leftJoin 사용
 	const myRooms = db
 		.select({
 			id: room.id,
-			name: user.name,
+			name: sql<string>`coalesce(${user.name}, '알 수 없음')`.as('room_name'),
 			lastMessage: lastMessageSq.content,
 			lastMessageAt: lastMessageSq.createdAt
 		})
 		.from(roomUser)
 		.innerJoin(room, eq(roomUser.roomId, room.id))
-		.innerJoin(
+		.leftJoin(
 			// 상대방 roomUser (나 제외)
 			db
 				.select({ roomId: roomUser.roomId, userId: roomUser.userId })
@@ -57,7 +58,7 @@ export async function getUserRooms(
 				.as('other_ru'),
 			sql`other_ru.room_id = ${roomUser.roomId}`
 		)
-		.innerJoin(user, sql`${user.id} = other_ru.user_id`)
+		.leftJoin(user, sql`${user.id} = other_ru.user_id`)
 		.leftJoin(lastMessageSq, sql`${lastMessageSq.roomId} = ${room.id}`)
 		.where(eq(roomUser.userId, userId))
 		.orderBy(desc(lastMessageSq.createdAt));
