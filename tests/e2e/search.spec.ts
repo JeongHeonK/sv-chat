@@ -61,4 +61,26 @@ test.describe('검색', () => {
 		await ctxA.close();
 		await ctxB.close();
 	});
+
+	test('사이드바 검색: 결과 없음 상태 표시', async ({ browser }) => {
+		const { context: ctxA, page: pageA } = await createAuthenticatedContext(browser, 'noresult-a');
+		const { context: ctxB } = await createAuthenticatedContext(browser, 'noresult-b');
+
+		// 홈으로 이동
+		await pageA.goto('/');
+
+		// 존재하지 않는 키워드 검색
+		const sidebarSearch = pageA.getByPlaceholder('메시지 검색...');
+		const searchPromise = pageA.waitForResponse(
+			(res) => res.url().includes('/api/messages/search') && res.ok()
+		);
+		await sidebarSearch.fill(`nonexistent${Date.now()}`);
+		await searchPromise;
+
+		// "검색 결과가 없습니다" 표시
+		await expect(pageA.getByText('검색 결과가 없습니다')).toBeVisible({ timeout: 5000 });
+
+		await ctxA.close();
+		await ctxB.close();
+	});
 });

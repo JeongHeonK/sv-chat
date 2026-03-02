@@ -47,4 +47,35 @@ test.describe('인증', () => {
 		await page.waitForURL('/login');
 		expect(page.url()).toContain('/login');
 	});
+
+	test('잘못된 비밀번호 → 에러 표시', async ({ page }) => {
+		const user = createTestUser('wrongpw');
+		await signup(page, user);
+		await page.context().clearCookies();
+
+		// 잘못된 비밀번호로 로그인 시도
+		await page.goto('/login');
+		await page.getByLabel('이메일').fill(user.email);
+		await page.getByLabel('비밀번호').fill('WrongPassword999');
+		await page.getByRole('button', { name: '로그인' }).click();
+
+		// 에러 메시지 표시 확인
+		await expect(page.getByRole('alert').filter({ hasText: '올바르지 않습니다' })).toBeVisible({
+			timeout: 5000
+		});
+		// /login에 머물러야 함
+		expect(page.url()).toContain('/login');
+	});
+
+	test('빈 필드 제출 → 클라이언트 검증 에러', async ({ page }) => {
+		await page.goto('/login');
+
+		// 빈 상태로 제출
+		await page.getByRole('button', { name: '로그인' }).click();
+
+		// 이메일/비밀번호 필드에 role="alert" 에러 메시지 표시
+		await expect(page.getByRole('alert').filter({ hasText: '입력해 주세요' }).first()).toBeVisible({
+			timeout: 3000
+		});
+	});
 });

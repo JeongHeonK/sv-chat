@@ -94,4 +94,44 @@ test.describe('실시간 메시지', () => {
 		await ctxA.close();
 		await ctxB.close();
 	});
+
+	test('빈 메시지 → 전송 버튼 비활성화', async ({ browser }) => {
+		const { context: ctxA, page: pageA } = await createAuthenticatedContext(browser, 'empty-a');
+		const { context: ctxB, user: userB } = await createAuthenticatedContext(browser, 'empty-b');
+
+		await createRoomWith(pageA, userB.name);
+
+		// 빈 상태에서 전송 버튼 비활성화 확인
+		const sendBtn = pageA.getByRole('button', { name: '전송' });
+		await expect(sendBtn).toBeDisabled();
+
+		// 공백만 입력해도 비활성화
+		await pageA.getByPlaceholder('메시지를 입력하세요').fill('   ');
+		await expect(sendBtn).toBeDisabled();
+
+		// 유효한 텍스트 입력 시 활성화
+		await pageA.getByPlaceholder('메시지를 입력하세요').fill('유효한 메시지');
+		await expect(sendBtn).toBeEnabled();
+
+		await ctxA.close();
+		await ctxB.close();
+	});
+
+	test('Enter 키로 메시지 전송', async ({ browser }) => {
+		const { context: ctxA, page: pageA } = await createAuthenticatedContext(browser, 'enter-a');
+		const { context: ctxB, user: userB } = await createAuthenticatedContext(browser, 'enter-b');
+
+		await createRoomWith(pageA, userB.name);
+
+		const message = `엔터키 테스트 ${Date.now()}`;
+		const input = pageA.getByPlaceholder('메시지를 입력하세요');
+		await input.fill(message);
+		await input.press('Enter');
+
+		// 메시지가 전송되어 화면에 표시
+		await expect(pageA.getByText(message)).toBeVisible({ timeout: 5000 });
+
+		await ctxA.close();
+		await ctxB.close();
+	});
 });
