@@ -8,13 +8,15 @@ const mockRooms: RoomSummary[] = [
 		id: 'room-1',
 		name: '홍길동',
 		lastMessage: '안녕하세요!',
-		lastMessageAt: new Date('2024-03-15T10:30:00Z')
+		lastMessageAt: new Date('2024-03-15T10:30:00Z'),
+		unreadCount: 0
 	},
 	{
 		id: 'room-2',
 		name: '김철수',
 		lastMessage: null,
-		lastMessageAt: null
+		lastMessageAt: null,
+		unreadCount: 0
 	}
 ];
 

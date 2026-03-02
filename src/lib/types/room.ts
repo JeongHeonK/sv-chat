@@ -3,4 +3,5 @@ export interface RoomSummary {
 	name: string;
 	lastMessage: string | null;
 	lastMessageAt: Date | null;
+	unreadCount: number;
 }
