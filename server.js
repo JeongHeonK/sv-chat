@@ -32,6 +32,7 @@ const roomUserTable = pgTable('room_user', {
 });
 
 // --- DB ---
+console.log('[DEBUG] Available env keys:', Object.keys(process.env).filter(k => k.includes('DATABASE') || k.includes('PG') || k.includes('RAILWAY')));
 if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
 const client = postgres(process.env.DATABASE_URL);
 const db = drizzle(client);
