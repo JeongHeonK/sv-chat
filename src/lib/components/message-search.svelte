@@ -1,6 +1,6 @@
 <script lang="ts">
-	/* eslint-disable svelte/no-navigation-without-resolve */
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { debounce } from '$lib/utils/debounce';
 	import { highlightMatches } from '$lib/utils/highlight';
 	import type { SearchMessageItem, SearchMessagesResponse } from '$lib/types/search';
@@ -63,7 +63,7 @@
 	}
 
 	function selectMessage(msg: SearchMessageItem) {
-		goto(`/chat/${msg.roomId}`);
+		goto(resolve(`/chat/${msg.roomId}`));
 	}
 
 	function handleResultKeydown(e: KeyboardEvent, msg: SearchMessageItem) {

@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
+	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { formatRelativeTime } from '$lib/utils/time-format';
 	import { X, Trash2 } from '@lucide/svelte';
@@ -27,6 +28,9 @@
 			});
 			if (res.ok) {
 				await invalidate('app:rooms');
+				if (page.params.roomId === room.id) {
+					await goto(resolve('/(app)'));
+				}
 			} else {
 				alert('채팅방 나가기 실패');
 			}
@@ -51,6 +55,9 @@
 			});
 			if (res.ok) {
 				await invalidate('app:rooms');
+				if (page.params.roomId === room.id) {
+					await goto(resolve('/(app)'));
+				}
 			} else {
 				alert('채팅방 삭제 실패');
 			}
