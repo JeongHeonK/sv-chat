@@ -15,15 +15,20 @@
 	let { room }: Props = $props();
 	let isLoading = $state(false);
 
-	async function handleLeave(e: MouseEvent) {
+	async function performRoomAction(
+		e: MouseEvent,
+		action: 'leave' | 'delete',
+		confirmMsg: string,
+		errorMsg: string
+	) {
 		e.preventDefault();
 		e.stopPropagation();
 
-		if (!confirm('이 채팅방에서 나가시겠습니까?')) return;
+		if (!confirm(confirmMsg)) return;
 
 		isLoading = true;
 		try {
-			const res = await fetch(`/api/rooms/${room.id}?action=leave`, {
+			const res = await fetch(`/api/rooms/${room.id}?action=${action}`, {
 				method: 'DELETE'
 			});
 			if (res.ok) {
@@ -32,41 +37,27 @@
 					await goto(resolve('/(app)'));
 				}
 			} else {
-				alert('채팅방 나가기 실패');
+				alert(errorMsg);
 			}
 		} catch (err) {
-			console.error('Error leaving room:', err);
-			alert('채팅방 나가기 실패');
+			console.error(`Error ${action} room:`, err);
+			alert(errorMsg);
 		} finally {
 			isLoading = false;
 		}
 	}
 
-	async function handleDelete(e: MouseEvent) {
-		e.preventDefault();
-		e.stopPropagation();
+	function handleLeave(e: MouseEvent) {
+		performRoomAction(e, 'leave', '이 채팅방에서 나가시겠습니까?', '채팅방 나가기 실패');
+	}
 
-		if (!confirm('이 채팅방을 삭제하시겠습니까? 상대방도 채팅방에 접근할 수 없습니다.')) return;
-
-		isLoading = true;
-		try {
-			const res = await fetch(`/api/rooms/${room.id}?action=delete`, {
-				method: 'DELETE'
-			});
-			if (res.ok) {
-				await invalidate('app:rooms');
-				if (page.params.roomId === room.id) {
-					await goto(resolve('/(app)'));
-				}
-			} else {
-				alert('채팅방 삭제 실패');
-			}
-		} catch (err) {
-			console.error('Error deleting room:', err);
-			alert('채팅방 삭제 실패');
-		} finally {
-			isLoading = false;
-		}
+	function handleDelete(e: MouseEvent) {
+		performRoomAction(
+			e,
+			'delete',
+			'이 채팅방을 삭제하시겠습니까? 상대방도 채팅방에 접근할 수 없습니다.',
+			'채팅방 삭제 실패'
+		);
 	}
 </script>
 
