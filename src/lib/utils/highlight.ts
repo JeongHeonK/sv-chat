@@ -28,5 +28,5 @@ export function highlightMatches(text: string, query: string): HighlightSegment[
 		segments.push({ type: 'text', value: text.slice(lastIndex) });
 	}
 
-	return segments.length > 0 ? segments : [{ type: 'text', value: text }];
+	return segments;
 }
