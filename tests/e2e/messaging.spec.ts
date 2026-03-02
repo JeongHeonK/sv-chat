@@ -87,6 +87,7 @@ test.describe('실시간 메시지', () => {
 			return;
 		}
 
+		// evaluate() 후 Svelte 반응성 업데이트 대기
 		await pageA.waitForTimeout(300);
 		const scrollBtn = pageA.getByRole('button', { name: '최하단으로 스크롤' });
 		await expect(scrollBtn).toBeVisible({ timeout: 3000 });

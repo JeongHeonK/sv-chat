@@ -35,11 +35,9 @@ test.describe('인증', () => {
 		await page.getByLabel('비밀번호').fill(user.password);
 		await page.getByRole('button', { name: '회원가입' }).click();
 
-		// 에러 상태: URL이 /signup에 머물거나 에러 role="alert" 표시
-		await page.waitForTimeout(1000);
-		const isOnSignup = page.url().includes('/signup');
-		const hasError = (await page.getByRole('alert').count()) > 0;
-		expect(isOnSignup || hasError).toBe(true);
+		// 에러 상태: /signup에 머물면서 에러 메시지 표시
+		await expect(page.getByRole('alert').first()).toBeVisible({ timeout: 5000 });
+		expect(page.url()).toContain('/signup');
 	});
 
 	test('미인증 접근 → /login 리다이렉트', async ({ page }) => {
