@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
+	import { resolve } from '$app/paths';
 	import { Button } from '$ui/button';
 	import * as Card from '$ui/card';
 	import FormField from '$lib/components/form-field.svelte';
@@ -56,8 +57,7 @@
 	<Card.Footer class="justify-center">
 		<p class="text-sm text-muted-foreground">
 			이미 계정이 있으신가요?
-			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-			<a href="/login" class="text-primary underline-offset-4 hover:underline">로그인</a>
+			<a href={resolve('/login')} class="text-primary underline-offset-4 hover:underline">로그인</a>
 		</p>
 	</Card.Footer>
 </Card.Root>
