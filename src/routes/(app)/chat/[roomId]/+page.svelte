@@ -36,6 +36,10 @@
 	let scrollToBottomFn: (() => void) | undefined = $state();
 	let messageInputRef: HTMLInputElement | null = $state(null);
 
+	// 채팅방 상태
+	let isRoomDeleted = $state(false);
+	let otherUserLeft = $state(false);
+
 	const autoScrollCallbacks: AutoScrollCallbacks = {
 		onAtBottomChange: (value) => {
 			isAtBottom = value;
@@ -111,6 +115,16 @@
 				if (!isAtBottom) newMessageCount += 1;
 			},
 			onSync: (msgs) => messageStore.mergeMessages(msgs),
+			onRoomDeleted: (eventData) => {
+				if (eventData.roomId === roomId) {
+					isRoomDeleted = true;
+				}
+			},
+			onRoomLeft: (eventData) => {
+				if (eventData.roomId === roomId) {
+					otherUserLeft = true;
+				}
+			},
 			getLastTimestamp: () => messageStore.getLastTimestamp()
 		});
 
@@ -154,7 +168,17 @@
 		</div>
 	{/if}
 	<div class="border-t p-4">
+		{#if isRoomDeleted}
+			<div class="mb-2 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+				이 채팅방이 삭제되었습니다.
+			</div>
+		{:else if otherUserLeft}
+			<div class="mb-2 rounded-md bg-yellow-600/10 p-3 text-sm text-yellow-700">
+				상대방이 채팅방에서 나갔습니다.
+			</div>
+		{/if}
 		<MessageInput
+			disabled={isRoomDeleted || otherUserLeft}
 			matchCount={searchMatches.length}
 			{currentMatchIndex}
 			onSearch={handleSearch}
