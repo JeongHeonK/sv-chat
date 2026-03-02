@@ -5,7 +5,18 @@ import { isValidSocketMessage, toMessage, type ChatMessage } from '$lib/types/ch
 interface SocketCallbacks {
 	onMessage: (msg: ChatMessage) => void;
 	onSync: (messages: ChatMessage[]) => void;
+	onRoomDeleted?: (data: { roomId: string }) => void;
+	onRoomLeft?: (data: { roomId: string }) => void;
 	getLastTimestamp: () => string | null;
+}
+
+function isRoomEvent(data: unknown): data is { roomId: string } {
+	return (
+		typeof data === 'object' &&
+		data !== null &&
+		'roomId' in data &&
+		typeof (data as Record<string, unknown>).roomId === 'string'
+	);
 }
 
 export function createSocketConnection(
@@ -21,6 +32,18 @@ export function createSocketConnection(
 	socket.on(SOCKET_EVENTS.MESSAGE_CREATED, (data: unknown) => {
 		if (!isValidSocketMessage(data)) return;
 		callbacks.onMessage(toMessage(data));
+	});
+
+	socket.on(SOCKET_EVENTS.ROOM_DELETED, (data: unknown) => {
+		if (isRoomEvent(data)) {
+			callbacks.onRoomDeleted?.(data);
+		}
+	});
+
+	socket.on(SOCKET_EVENTS.ROOM_LEFT, (data: unknown) => {
+		if (isRoomEvent(data)) {
+			callbacks.onRoomLeft?.(data);
+		}
 	});
 
 	socket.io.on('reconnect', () => {
@@ -45,6 +68,8 @@ export function createSocketConnection(
 	return {
 		disconnect: () => {
 			socket.off(SOCKET_EVENTS.MESSAGE_CREATED);
+			socket.off(SOCKET_EVENTS.ROOM_DELETED);
+			socket.off(SOCKET_EVENTS.ROOM_LEFT);
 			socket.io.off('reconnect');
 			socket.disconnect();
 		}
