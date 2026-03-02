@@ -121,7 +121,7 @@
 				}
 			},
 			onRoomLeft: (eventData) => {
-				if (eventData.roomId === roomId) {
+				if (eventData.roomId === roomId && eventData.userId !== data.currentUserId) {
 					otherUserLeft = true;
 				}
 			},
@@ -178,6 +178,7 @@
 			</div>
 		{/if}
 		<MessageInput
+			roomId={data.roomId}
 			disabled={isRoomDeleted || otherUserLeft}
 			matchCount={searchMatches.length}
 			{currentMatchIndex}
