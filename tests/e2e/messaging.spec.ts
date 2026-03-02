@@ -126,6 +126,9 @@ test.describe('실시간 메시지', () => {
 		const message = `엔터키 테스트 ${Date.now()}`;
 		const input = pageA.getByPlaceholder('메시지를 입력하세요');
 		await input.fill(message);
+
+		// fill 후 canSend 반영 대기 (전송 버튼 활성화 확인)
+		await expect(pageA.getByRole('button', { name: '전송' })).toBeEnabled();
 		await input.press('Enter');
 
 		// 메시지가 전송되어 화면에 표시
