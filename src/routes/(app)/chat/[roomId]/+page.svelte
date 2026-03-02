@@ -7,6 +7,7 @@
 	import type { ChatMessage } from '$lib/types/chat';
 	import MessageList from '$lib/components/message-list.svelte';
 	import MessageInput from '$lib/components/message-input.svelte';
+	import ChatRoomHeader from '$lib/components/chat-room-header.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -35,7 +36,7 @@
 </script>
 
 <div class="flex h-full flex-col">
-	<h2 class="border-b p-4 text-lg font-semibold">채팅방</h2>
+	<ChatRoomHeader title="채팅방" />
 	<div class="flex-1 overflow-y-auto" use:autoScroll>
 		<MessageList messages={messageStore.messages} currentUserId={data.currentUserId} />
 	</div>

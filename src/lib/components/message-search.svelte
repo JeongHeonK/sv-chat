@@ -64,6 +64,12 @@
 		goto(`/chat/${msg.roomId}`);
 	}
 
+	function handleResultKeydown(e: KeyboardEvent, msg: SearchMessagesResult) {
+		if (e.key === 'Enter') {
+			selectMessage(msg);
+		}
+	}
+
 	function loadMore() {
 		search(currentQuery, offset);
 	}
@@ -96,7 +102,7 @@
 					aria-selected="false"
 					class="cursor-pointer px-3 py-2 hover:bg-accent"
 					onclick={() => selectMessage(msg)}
-					onkeydown={(e) => e.key === 'Enter' && selectMessage(msg)}
+					onkeydown={(e) => handleResultKeydown(e, msg)}
 					tabindex="0"
 				>
 					<div class="text-xs font-medium">{msg.senderName}</div>
