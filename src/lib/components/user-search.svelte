@@ -9,11 +9,15 @@
 	let showDropdown = $state(false);
 	let searched = $state(false);
 
+	function resetState() {
+		results = [];
+		showDropdown = false;
+		searched = false;
+	}
+
 	async function search(q: string) {
 		if (!q.trim()) {
-			results = [];
-			showDropdown = false;
-			searched = false;
+			resetState();
 			return;
 		}
 
@@ -30,9 +34,7 @@
 	function handleInput() {
 		if (!query.trim()) {
 			debouncedSearch.cancel();
-			results = [];
-			showDropdown = false;
-			searched = false;
+			resetState();
 			return;
 		}
 		debouncedSearch(query);
@@ -48,9 +50,7 @@
 		if (res.ok) {
 			const data: { roomId: string } = await res.json();
 			query = '';
-			results = [];
-			showDropdown = false;
-			searched = false;
+			resetState();
 			await goto(`/chat/${data.roomId}`);
 		}
 	}

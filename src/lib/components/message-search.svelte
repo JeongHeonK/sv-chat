@@ -15,13 +15,18 @@
 	let offset = $state(0);
 	let currentQuery = $state('');
 
+	function resetState() {
+		results = [];
+		showResults = false;
+		searched = false;
+		hasMore = false;
+		offset = 0;
+		currentQuery = '';
+	}
+
 	async function search(q: string, searchOffset = 0) {
 		if (!q.trim()) {
-			results = [];
-			showResults = false;
-			searched = false;
-			hasMore = false;
-			offset = 0;
+			resetState();
 			return;
 		}
 
@@ -49,11 +54,7 @@
 	function handleInput() {
 		if (!query.trim()) {
 			debouncedSearch.cancel();
-			results = [];
-			showResults = false;
-			searched = false;
-			hasMore = false;
-			offset = 0;
+			resetState();
 			return;
 		}
 		debouncedSearch(query);
