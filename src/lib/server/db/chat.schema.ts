@@ -1,11 +1,16 @@
-import { index, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { index, pgTable, text, timestamp, unique } from 'drizzle-orm/pg-core';
 import { user } from './auth.schema';
 
-export const room = pgTable('room', {
-	id: text('id').primaryKey(),
-	createdAt: timestamp('created_at').notNull().defaultNow(),
-	updatedAt: timestamp('updated_at').notNull().defaultNow()
-});
+export const room = pgTable(
+	'room',
+	{
+		id: text('id').primaryKey(),
+		participantHash: text('participant_hash'),
+		createdAt: timestamp('created_at').notNull().defaultNow(),
+		updatedAt: timestamp('updated_at').notNull().defaultNow()
+	},
+	(t) => [unique('uq_room_participant_hash').on(t.participantHash)]
+);
 
 export const roomUser = pgTable('room_user', {
 	id: text('id').primaryKey(),
@@ -15,7 +20,8 @@ export const roomUser = pgTable('room_user', {
 	userId: text('user_id')
 		.notNull()
 		.references(() => user.id, { onDelete: 'cascade' }),
-	joinedAt: timestamp('joined_at').notNull().defaultNow()
+	joinedAt: timestamp('joined_at').notNull().defaultNow(),
+	lastReadAt: timestamp('last_read_at').notNull().defaultNow()
 });
 
 export const message = pgTable(
