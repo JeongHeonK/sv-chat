@@ -33,14 +33,14 @@ describe('MessageBubble — URL 렌더링', () => {
 		expect(link.element().getAttribute('href')).toBe('https://example.com');
 	});
 
-	it('URL 링크에 target="_blank"과 rel="noopener noreferrer"이 설정된다', async () => {
+	it('URL 링크에 target="_blank"과 rel="external noopener noreferrer"이 설정된다', async () => {
 		const message = createMessage({ content: 'https://example.com' });
 		const screen = render(MessageBubble, { props: { message, isMine: false } });
 
 		const link = screen.getByRole('link', { name: 'https://example.com' });
 		const el = link.element();
 		expect(el.getAttribute('target')).toBe('_blank');
-		expect(el.getAttribute('rel')).toBe('noopener noreferrer');
+		expect(el.getAttribute('rel')).toBe('external noopener noreferrer');
 	});
 
 	it('www. 접두사 URL은 https://가 자동으로 추가된다', async () => {
