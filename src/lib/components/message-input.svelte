@@ -16,7 +16,7 @@
 			result,
 			update
 		}: {
-			result: { type: string };
+			result: import('@sveltejs/kit').ActionResult;
 			update: () => Promise<void>;
 		}) => {
 			await update();
