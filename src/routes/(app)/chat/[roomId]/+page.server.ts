@@ -1,7 +1,7 @@
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
-import { assertRoomMember, getMessages, updateLastReadAt } from '$lib/server/rooms';
+import { assertRoomMember, getMessages } from '$lib/server/rooms';
 import { chatService } from '$lib/server/chat-service-instance';
 
 export const load: PageServerLoad = async (event) => {
@@ -10,7 +10,6 @@ export const load: PageServerLoad = async (event) => {
 	const { roomId } = event.params;
 
 	await assertRoomMember(db, userId, roomId);
-	await updateLastReadAt(db, userId, roomId);
 
 	const before = event.url.searchParams.get('before');
 	const messages = await getMessages(db, roomId, {
