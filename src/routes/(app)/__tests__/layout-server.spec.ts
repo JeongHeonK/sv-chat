@@ -5,25 +5,33 @@ vi.mock('$lib/server/db', () => ({
 	db: {}
 }));
 
+const mockUpdateLastReadAt = vi.fn().mockResolvedValue(undefined);
+
 vi.mock('$lib/server/rooms', () => ({
 	getUserRooms: vi.fn().mockResolvedValue([]),
-	getUnreadCounts: vi.fn().mockResolvedValue([])
+	getUnreadCounts: vi.fn().mockResolvedValue([]),
+	updateLastReadAt: (...args: unknown[]) => mockUpdateLastReadAt(...args)
 }));
 
 type LoadEvent = {
 	locals: { user?: User; session?: Session };
+	depends: (key: string) => void;
+	url: URL;
 };
 
-function makeEvent(user?: Partial<User>, session?: Partial<Session>): LoadEvent {
+function makeEvent(user?: Partial<User>, session?: Partial<Session>, pathname = '/'): LoadEvent {
 	return {
-		locals: { user: user as User | undefined, session: session as Session | undefined }
-	} as LoadEvent;
+		locals: { user: user as User | undefined, session: session as Session | undefined },
+		depends: vi.fn(),
+		url: new URL(`http://localhost${pathname}`)
+	} as unknown as LoadEvent;
 }
 
 describe('(app) layout server — 인증 가드', () => {
 	let load: (event: unknown) => Promise<unknown>;
 
 	beforeEach(async () => {
+		vi.clearAllMocks();
 		const mod = await import('../+layout.server');
 		load = mod.load as (event: unknown) => Promise<unknown>;
 	});
@@ -74,5 +82,23 @@ describe('(app) layout server — 인증 가드', () => {
 
 		const result = await load(event as never);
 		expect(result).toEqual({ user, rooms: [] });
+	});
+
+	it('채팅방 페이지에서 updateLastReadAt을 호출한다', async () => {
+		const user = { id: '1', email: 'user@example.com', name: '홍길동' };
+		const session = { id: 's1', token: 'tok', userId: '1' };
+		const event = makeEvent(user, session, '/chat/room-123');
+
+		await load(event as never);
+		expect(mockUpdateLastReadAt).toHaveBeenCalledWith({}, '1', 'room-123');
+	});
+
+	it('메인 페이지에서는 updateLastReadAt을 호출하지 않는다', async () => {
+		const user = { id: '1', email: 'user@example.com', name: '홍길동' };
+		const session = { id: 's1', token: 'tok', userId: '1' };
+		const event = makeEvent(user, session, '/');
+
+		await load(event as never);
+		expect(mockUpdateLastReadAt).not.toHaveBeenCalled();
 	});
 });

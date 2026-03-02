@@ -30,9 +30,10 @@ export async function updateLastReadAt(
 	roomId: string,
 	timestamp?: Date
 ): Promise<void> {
-	const readAt = timestamp ?? new Date();
+	// 기본값: PostgreSQL NOW() 사용 — message.createdAt과 동일한 시간 소스로 정확한 비교 보장
+	// timestamp 인자는 테스트 등에서 특정 시점을 지정할 때만 사용
 	await db
 		.update(roomUser)
-		.set({ lastReadAt: readAt })
+		.set({ lastReadAt: timestamp ?? sql`NOW()` })
 		.where(and(eq(roomUser.userId, userId), eq(roomUser.roomId, roomId)));
 }
